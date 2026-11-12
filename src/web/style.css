@@ -792,8 +792,15 @@ body[data-layout='lab'] .pager {
   color: #fff;
 }
 
-.btn.is-ready:hover:not(:disabled) {
-  filter: brightness(1.08);
+/* A filled button keeps its colour on hover and only darkens a little. */
+.btn-explore.is-ready:hover:not(:disabled) {
+  border-color: var(--curious);
+  background: color-mix(in srgb, var(--curious) 88%, #000);
+}
+
+.btn-send.is-ready:hover:not(:disabled) {
+  border-color: var(--goal);
+  background: color-mix(in srgb, var(--goal) 88%, #000);
 }
 
 .btn-play {
