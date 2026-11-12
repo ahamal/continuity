@@ -9,7 +9,7 @@ export interface SearchOptions {
 }
 
 /**
- * Stages 3 and 4. Search breadth-first through predicted states, each
+ * Search breadth-first through predicted states, each
  * prediction built on the one before. If the search gives up, step toward the
  * goal greedily instead.
  */

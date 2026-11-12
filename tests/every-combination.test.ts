@@ -39,7 +39,7 @@ describe('every combination', () => {
     expect(seen({ x1: 5 })).toBe(1);
   });
 
-  it('predicts as stages 3 to 5 do', () => {
+  it('predicts as the two-level agent does', () => {
     const agent = everyCombination.build(new Grid2D());
     expect(agent.predict([4, 4], 'right')).toBeNull();
     for (let x = 0; x < 5; x++) agent.observe([x, 4], 'right', [x + 1, 4]);

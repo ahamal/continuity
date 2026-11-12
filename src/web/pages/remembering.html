@@ -1,0 +1,117 @@
+<div class="story" style="--stage: '0'">
+  <article class="prose">
+    <h1>The first agent</h1>
+    <p>
+      This is the first build of the engine from the last page. It keeps two levels of
+      assumption: what a move does in general, and what it did at one exact place.
+    </p>
+
+    <h2>How it works</h2>
+    <ul>
+      <li>
+        <strong>Writes.</strong> Two rows for every move it sees: one for the move alone,
+        "going right adds one to x", and one for the move at that exact place, "going right
+        from (9, 4) changes nothing".
+      </li>
+      <li>
+        <strong>Answers.</strong> With the row for the exact place if it has one, and otherwise
+        with the row for the move alone.
+      </li>
+      <li>
+        <strong>Explores.</strong> It makes the move it is most curious about, and stops once
+        it has seen each move five times.
+      </li>
+    </ul>
+
+    <h2>Try it</h2>
+    <p>
+      Press Explore, then click a cell beyond the wall and send it there. The knowledge base on
+      the right shows the rows as they are written. A bar on the grid marks a move it has
+      learned does nothing, and each bar took its own bump.
+    </p>
+  </article>
+
+  <div class="demo" data-demo="remembering"></div>
+
+  <article class="prose">
+    <h2>Results</h2>
+    <p>
+      We ran the agent 500 times in each world. In each run it explores first and is then sent
+      to a goal.
+    </p>
+    <table class="facts-table">
+      <thead>
+        <tr><th>World</th><th>Runs that reached the goal</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1D line</td><td>500 of 500</td></tr>
+        <tr><td>2D grid</td><td>500 of 500</td></tr>
+        <tr><td>2D grid with a wall</td><td>367 of 500</td></tr>
+      </tbody>
+    </table>
+    <p>
+      On the line and the open grid it works every time. A few moves are enough for it to know
+      what each move does, and the general rows then carry it to places it has never been.
+    </p>
+
+    <h2>What is missing</h2>
+    <p>
+      The wall is where it struggles, and the reason is the two levels. The agent can say
+      "going right adds one to x" for the whole grid, and it can say "going right from (4, 4)
+      changes nothing" for one cell. It has no way to say anything in between, such as "going
+      right at x = 9 changes nothing", which would cover the whole right edge in one row.
+    </p>
+    <p>
+      So it learns the edge and the wall one cell at a time. Bumping the right edge at (9, 4)
+      tells it nothing about (9, 5). Knowing the whole world with a wall this way takes 388
+      rows, nearly one for every move there is. When it is sent to a goal behind the wall, it
+      plans straight through, bumps, writes one row and plans again, and in 133 of the 500
+      runs it runs out of tries.
+    </p>
+    <p>
+      Its curiosity is also about moves and says nothing about places. Once it has seen each
+      move five times it is confident, which takes about twenty moves near where it starts. So
+      exploring never reaches the wall, and it only finds the wall when a goal sends it there.
+    </p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 236" role="img" aria-label="The seven combinations of the facts action, x and y, arranged in three levels by how many facts each has. Only two are stored: action alone, and all three together.">
+      <path class="f-muted" d="M150,45 V111 M150,45 L300,111 M300,45 L150,111 M300,45 L450,111 M450,45 L300,111 M450,45 V111 M150,121 L300,187 M300,121 V187 M450,121 L300,187" />
+
+      <rect class="f-solid" x="145.5" y="35.5" width="9" height="9" />
+      <text class="f-t" x="150" y="27" text-anchor="middle">action</text>
+      <rect class="f-paper f-dash" x="295.5" y="35.5" width="9" height="9" />
+      <text class="f-tm" x="300" y="27" text-anchor="middle">x</text>
+      <rect class="f-paper f-dash" x="445.5" y="35.5" width="9" height="9" />
+      <text class="f-tm" x="450" y="27" text-anchor="middle">y</text>
+
+      <rect class="f-paper f-dash" x="145.5" y="111.5" width="9" height="9" />
+      <text class="f-tm" x="138" y="119" text-anchor="end">action, x</text>
+      <rect class="f-paper f-dash" x="295.5" y="111.5" width="9" height="9" />
+      <text class="f-tm" x="312" y="132">action, y</text>
+      <rect class="f-paper f-dash" x="445.5" y="111.5" width="9" height="9" />
+      <text class="f-tm" x="462" y="119">x, y</text>
+
+      <rect class="f-solid" x="295.5" y="187.5" width="9" height="9" />
+      <text class="f-t" x="300" y="212" text-anchor="middle">action, x, y</text>
+
+      <text class="f-th" x="624" y="43" text-anchor="end">1 FACT: APPLIES WIDELY</text>
+      <text class="f-th" x="624" y="119" text-anchor="end">2 FACTS</text>
+      <text class="f-th" x="624" y="195" text-anchor="end">3 FACTS: EXACTLY HERE</text>
+
+      <rect class="f-solid" x="16" y="221" width="9" height="9" />
+      <text class="f-tm" x="31" y="229">stored today</text>
+      <rect class="f-paper f-dash" x="126" y="221" width="9" height="9" />
+      <text class="f-tm" x="141" y="229">never written</text>
+    </svg>
+    <figcaption><b>Fig 3.1</b>Three facts give seven combinations. This agent writes two of them. "Going right at x = 9 changes nothing" would be at <i>action, x</i>.</figcaption>
+  </figure>
+
+    <h2>Next</h2>
+    <p>
+      The second agent writes the rows in between. For every move it writes a row for every
+      combination of the facts, so "going right at x = 9" exists alongside the other two. The
+      question then becomes which row should answer. The second agent lets the rows vote.
+    </p>
+  </article>
+</div>

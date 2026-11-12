@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { blockedMoves } from '../src/agents/inspect';
-import { everyRow, twoLevels } from '../src/agents/recipes';
+import { everyRow, fromCounts, hierarchy, twoLevels } from '../src/agents/recipes';
 import { bench } from '../src/runs/bench';
 import { Run, replay } from '../src/runs/run';
 import { summarise } from '../src/runs/summary';
@@ -85,17 +85,31 @@ describe('replay', () => {
 // These numbers describe how each stage behaves. They must not change when
 // later stages are added. If one changes, an earlier stage has been altered.
 describe('pinned results', () => {
-  it('stages 3 and 4 (two levels), seeds 1 to 500', () => {
+  it('two levels, seeds 1 to 500', () => {
     const solved = (id: string) => bench(twoLevels, findScenario(id)!, 500).solved;
     expect(solved('1d')).toBe(500);
     expect(solved('2d')).toBe(500);
     expect(solved('2d-walls')).toBe(367);
   });
 
-  it('stage 8 (every row has a say), seeds 1 to 500', () => {
+  it('every row has a say, seeds 1 to 500', () => {
     const solved = (id: string) => bench(everyRow, findScenario(id)!, 500).solved;
     expect(solved('1d')).toBe(500);
     expect(solved('2d')).toBe(131);
     expect(solved('2d-walls')).toBe(59);
+  }, 60_000);
+
+  it('read from the counts, seeds 1 to 500', () => {
+    const solved = (id: string) => bench(fromCounts, findScenario(id)!, 500).solved;
+    expect(solved('1d')).toBe(500);
+    expect(solved('2d')).toBe(500);
+    expect(solved('2d-walls')).toBe(500);
+  }, 120_000);
+
+  it('every row holds (built by hand), seeds 1 to 500', () => {
+    const solved = (id: string) => bench(hierarchy, findScenario(id)!, 500).solved;
+    expect(solved('1d')).toBe(500);
+    expect(solved('2d')).toBe(500);
+    expect(solved('2d-walls')).toBe(500);
   }, 60_000);
 });

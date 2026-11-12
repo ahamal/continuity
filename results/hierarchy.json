@@ -1,0 +1,38 @@
+[
+  {
+    "recipe": "hierarchy",
+    "scenario": "1d",
+    "seeds": 500,
+    "solved": 500,
+    "failed": 0,
+    "meanExploreSteps": 42,
+    "meanGoalSteps": 20,
+    "meanSurprises": 0,
+    "meanEntries": 24,
+    "greedyPlans": 0
+  },
+  {
+    "recipe": "hierarchy",
+    "scenario": "2d",
+    "seeds": 500,
+    "solved": 500,
+    "failed": 0,
+    "meanExploreSteps": 100,
+    "meanGoalSteps": 39,
+    "meanSurprises": 0,
+    "meanEntries": 112,
+    "greedyPlans": 0
+  },
+  {
+    "recipe": "hierarchy",
+    "scenario": "2d-walls",
+    "seeds": 500,
+    "solved": 500,
+    "failed": 0,
+    "meanExploreSteps": 100,
+    "meanGoalSteps": 8,
+    "meanSurprises": 0,
+    "meanEntries": 87,
+    "greedyPlans": 0
+  }
+]

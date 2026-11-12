@@ -1,52 +1,82 @@
-import { everyCombination, everyRow, twoLevels } from '../../agents/recipes';
-import type { Recipe } from '../../agents/recipes';
+// The pages of the site, in order. Each is a written page. A page can hold
+// small labs between its paragraphs: it marks where with `data-demo="name"`,
+// and the lab for that name is set up in `demos` below.
+//
+// Stage numbers come from the order of this list. Nothing else should write a
+// stage number down, so that the list can be reordered.
+
+import { movesCounted, readHierarchy } from '../../agents/from-counts/from-counts';
+import { everyRow, fromCounts, twoLevels } from '../../agents/recipes';
 import { type LabOptions, createLab } from '../lab/lab';
+import findings from './findings.html?raw';
+import hierarchy from './hierarchy.html?raw';
 import implementation from './implementation.html?raw';
-import states from './states.html?raw';
+import remembering from './remembering.html?raw';
 import theory from './theory.html?raw';
-import world1d from './world-1d.html?raw';
-import world2d from './world-2d.html?raw';
-import worldCombinations from './world-combinations.html?raw';
-import worldEveryRow from './world-every-row.html?raw';
-import worldWalls from './world-walls.html?raw';
+import voting from './voting.html?raw';
 
 export interface Page {
   id: string;
-  /** Short name shown in the navigation. */
+  /** Name shown in the navigation. It says what the page is about. */
   label: string;
   /** Which part of the work the page belongs to. */
   part: number;
   /** True for the stage the work has reached. */
   current?: boolean;
-  /** A lab page fills one screen and does not scroll as a whole. */
+  /** `lab`: one fixed screen that does not scroll. No page uses it now. */
   layout?: 'lab';
-  /** Fill `container` with the page. May return a function that cleans up. */
-  mount(container: HTMLElement): (() => void) | void;
+  /**
+   * Fill `container` with the page. `stage` is the page's number, such as
+   * "03". May return a function that cleans up.
+   */
+  mount(container: HTMLElement, stage: string): (() => void) | void;
 }
 
-function prose(html: string): Page['mount'] {
-  return (container) => {
-    container.innerHTML = html;
-  };
-}
+// The walls world first: it is where each agent's limits show.
+const WORLDS = ['2d-walls', '2d', '1d'];
+
+/** The small labs that pages place between their paragraphs, by name. */
+const demos: Record<string, LabOptions> = {
+  // The first agent, with the rows it has written beside it.
+  remembering: {
+    recipe: twoLevels,
+    scenarioIds: WORLDS,
+    compact: true,
+    knowledge: 'rows',
+    holdsTitle: 'Knowledge base',
+  },
+  // Every row has a say. The point is the bars, and the row behind each one.
+  voting: {
+    recipe: everyRow,
+    scenarioIds: ['2d-walls'],
+    compact: true,
+    knowledge: 'reasons',
+    holdsTitle: 'Knowledge base',
+    stays: 'expected',
+  },
+  // The hierarchy read from the counts, linked to the world.
+  hierarchy: {
+    recipe: fromCounts,
+    scenarioIds: WORLDS,
+    compact: true,
+    knowledge: 'hierarchy',
+    holdsTitle: 'Knowledge base',
+    hierarchy: (agent) => ({ rows: readHierarchy(agent), moves: movesCounted(agent) }),
+    stays: 'expected',
+  },
+};
 
 /**
- * A page with an interactive lab. The page marks where the lab goes with
- * `data-lab` and where its set-up controls go with `data-lab-setup`. Each lab
- * page names the recipe for its stage, so the page keeps showing that stage's
- * agent when later stages are added.
+ * A written page. Its text says `--stage: '0'` where the page's number goes,
+ * for numbering its sections, and `data-demo="name"` where a lab goes.
  */
-function withLab(
-  html: string,
-  recipe: Recipe,
-  scenarioIds: string[],
-  options: Pick<LabOptions, 'knowledge' | 'stays' | 'trustedRow'> = {},
-): Page['mount'] {
-  return (container) => {
-    container.innerHTML = html;
-    const slot = container.querySelector<HTMLElement>('[data-lab]')!;
-    const setupSlot = container.querySelector<HTMLElement>('[data-lab-setup]');
-    return createLab(slot, { recipe, scenarioIds, setupSlot, ...options });
+function paper(html: string): Page['mount'] {
+  return (container, stage) => {
+    container.innerHTML = html.replace("--stage: '0'", `--stage: '${Number(stage)}'`);
+    const cleanups = [...container.querySelectorAll<HTMLElement>('[data-demo]')].map((slot) =>
+      createLab(slot, demos[slot.dataset.demo!]!),
+    );
+    return () => cleanups.forEach((cleanup) => cleanup());
   };
 }
 
@@ -56,34 +86,11 @@ export const parts: { id: number; label: string; note: string }[] = [
   { id: 2, label: 'Part 2', note: 'Working backwards: continuities written by hand for each world. Not started.' },
 ];
 
-/** The stages, in order. Each one is a page. */
 export const pages: Page[] = [
-  { id: 'theory', label: 'Theory', part: 1, mount: prose(theory) },
-  { id: 'implementation', label: 'Implementation', part: 1, mount: prose(implementation) },
-  { id: '1d', label: '1D world', part: 1, layout: 'lab', mount: withLab(world1d, twoLevels, ['1d']) },
-  { id: '2d', label: '2D world', part: 1, layout: 'lab', mount: withLab(world2d, twoLevels, ['2d']) },
-  { id: 'walls', label: '2D world with walls', part: 1, layout: 'lab', mount: withLab(worldWalls, twoLevels, ['2d-walls']) },
-  { id: 'states', label: 'What is left open', part: 1, mount: prose(states) },
-  {
-    id: 'combinations',
-    label: 'Every combination',
-    part: 1,
-    layout: 'lab',
-    mount: withLab(worldCombinations, everyCombination, ['1d', '2d', '2d-walls'], {
-      knowledge: 'combinations',
-      trustedRow: 'the row of the action with its usual change',
-    }),
-  },
-  {
-    id: 'every-row',
-    label: 'Every row has a say',
-    part: 1,
-    current: true,
-    layout: 'lab',
-    mount: withLab(worldEveryRow, everyRow, ['1d', '2d', '2d-walls'], {
-      knowledge: 'combinations',
-      stays: 'expected',
-      trustedRow: "a row that agrees with the action's answer",
-    }),
-  },
+  { id: 'theory', label: 'Identity Continuity', part: 1, mount: paper(theory) },
+  { id: 'implementation', label: 'Building the engine', part: 1, mount: paper(implementation) },
+  { id: 'remembering', label: 'The first agent', part: 1, mount: paper(remembering) },
+  { id: 'voting', label: 'The second agent', part: 1, mount: paper(voting) },
+  { id: 'hierarchy', label: 'The third agent', part: 1, mount: paper(hierarchy) },
+  { id: 'findings', label: 'Findings', part: 1, current: true, mount: paper(findings) },
 ];

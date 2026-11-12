@@ -14,7 +14,11 @@ export interface LearningProps {
   possibleMoves: number | null;
   /** Which row's count decides trust, in words. It depends on what the agent stores. */
   trustedRow: string;
+  /** Replaces the sentence about trust, for an agent whose confidence is not a fixed count. */
+  note?: string;
 }
+
+const MAX_SQUARES = 10;
 
 export function renderLearning(el: HTMLElement, props: LearningProps): void {
   const { agent, summary } = props;
@@ -22,8 +26,10 @@ export function renderLearning(el: HTMLElement, props: LearningProps): void {
   const needed = confidence[0]?.needed ?? 0;
 
   const items = confidence.map((row) => {
+    // A few squares when the target is small. A count when it is not.
     const squares = h('span', { class: 'squares' });
-    for (let i = 0; i < row.needed; i++) squares.append(h('i', { class: i < row.seen ? 'is-on' : '' }));
+    if (row.needed > MAX_SQUARES) squares.append(h('span', { class: 'panel-note' }, `${row.seen} of ${row.needed}`));
+    else for (let i = 0; i < row.needed; i++) squares.append(h('i', { class: i < row.seen ? 'is-on' : '' }));
     return h('span', { class: cx('trust', summary.lastStep?.action === row.action && 'is-latest') },
       h('span', { class: 'action' }, actionIcon(row.action), row.action),
       squares,
@@ -34,7 +40,7 @@ export function renderLearning(el: HTMLElement, props: LearningProps): void {
   put(el,
     h('div', { class: 'trusts' }, ...items),
     h('p', { class: 'muted derived-note' },
-      `Trusted once ${props.trustedRow} is seen ${needed} times (fixed in the code). `,
+      props.note ? `${props.note} ` : `Trusted once ${props.trustedRow} is seen ${needed} times (fixed in the code). `,
       props.possibleMoves !== null && `It has made ${tried} of ${props.possibleMoves} possible moves itself.`),
   );
 }

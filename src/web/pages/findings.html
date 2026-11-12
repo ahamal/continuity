@@ -1,0 +1,123 @@
+<article class="prose" style="--stage: '0'">
+  <h1>Findings</h1>
+
+  <p>
+    We built three agents from the conjecture and ran each of them in three small worlds. This
+    page puts together what they showed, and what has to come next.
+  </p>
+
+  <h2>The three agents</h2>
+  <table class="facts-table">
+    <thead>
+      <tr><th>Agent</th><th>Writes</th><th>Answers</th><th>Line</th><th>Grid</th><th>Grid with a wall</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>First</td><td>Two rows for every move: the move alone, and the move at one exact place</td><td>With the exact place if it has it, otherwise with the move alone</td><td>500</td><td>500</td><td>367</td></tr>
+      <tr><td>Second</td><td>A row for every combination of the facts in a move</td><td>Every row that applies votes</td><td>500</td><td>131</td><td>59</td></tr>
+      <tr><td>Third</td><td>The same rows, with each different move counted once</td><td>With the most specific row that applies</td><td>500</td><td>500</td><td>500</td></tr>
+    </tbody>
+  </table>
+  <p>
+    The numbers are runs that reached the goal, out of 500. In each run the agent explores
+    first and is then sent to a goal.
+  </p>
+  <p>
+    Two more agents were built along the way and have no page of their own. One stores every
+    combination but answers like the first agent, and gets the same results as the first. The
+    other has its hierarchy built by a procedure we wrote by hand, to see what we were aiming
+    for. It also reaches the goal in every run.
+  </p>
+
+  <h2>What worked</h2>
+  <ol>
+    <li>
+      <strong>The conjecture can be built.</strong> The third agent starts with no knowledge of
+      its world and no training. It learns a line, a grid, and a grid with a wall, and it
+      reaches its goal in all 1,500 runs.
+    </li>
+    <li>
+      <strong>General assumptions reach places the agent has never been.</strong> After a few
+      moves, "going right adds one to x" is enough to plan a route across cells it has not
+      visited. That was already true of the first agent.
+    </li>
+    <li>
+      <strong>The hierarchy comes out of counting.</strong> We did not tell the third agent
+      which facts matter. It wrote every combination, and the rows about a move ended up on top
+      because they need the fewest specific rows beneath them. For the grid with a wall, 18
+      rows do all the answering, where the first agent needed 388.
+    </li>
+    <li>
+      <strong>General and specific rows work together when the specific one answers.</strong>
+      The second agent let the rows vote and did worse than the first. The third agent uses the
+      same rows and follows the most specific one. Every row in its hierarchy is then right
+      every time within its own range.
+    </li>
+    <li>
+      <strong>Being wrong needs nothing extra.</strong> A wrong prediction is written like any
+      other move, and because it is more specific, it answers from then on. The agent does have
+      to try its guesses, though. The third agent goes to the moves it is least sure about, and
+      that is how it finds the wall.
+    </li>
+  </ol>
+
+  <h2>What is missing</h2>
+  <p>
+    The agents learned the wall as a set of separate cases, and never as one idea. "Something
+    is in the way" cannot be said with x and y, so the wall is ten unrelated rows. Nothing
+    learned at one side of it helps at the next side, at another wall, or in another game.
+  </p>
+  <p>How small the hierarchy can be depends on the facts the agent is given:</p>
+  <table class="facts-table">
+    <thead>
+      <tr><th>The facts of a state</th><th>Rows for the grid with a wall</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>x and y, with one row for every move</td><td>388</td></tr>
+      <tr><td>x and y, as a hierarchy</td><td>18</td></tr>
+      <tr><td>What is to the left, right, above and below</td><td>8, by our estimate</td></tr>
+      <tr><td>Things at places, and "two things cannot be in the same place"</td><td>about 5, by our estimate</td></tr>
+    </tbody>
+  </table>
+  <p>The first two are measured. The last two we have not built yet.</p>
+  <p>
+    Better facts have a cost. The third agent writes every combination of the facts in a move,
+    and a fact about the state appears in a move twice, before and after. So each fact added
+    multiplies the rows by four:
+  </p>
+  <table class="facts-table">
+    <thead>
+      <tr><th>The facts of a state</th><th>Facts in one move</th><th>Rows written for one move</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>A position on a line</td><td>4</td><td>15</td></tr>
+      <tr><td>x and y</td><td>7</td><td>127</td></tr>
+      <tr><td>x, y and what is to the left, right, above and below</td><td>15</td><td>32,767</td></tr>
+      <tr><td>One more fact</td><td>17</td><td>131,071</td></tr>
+    </tbody>
+  </table>
+  <p>
+    So better facts make the hierarchy smaller, and they make writing everything down
+    impossible. Writing every combination let us look at what is there without choosing in
+    advance. It cannot be how the engine works in the end.
+  </p>
+  <p>
+    Both problems lead back to the first half of the conjecture. Every agent here was handed
+    its one identity and the facts that describe it. Everything they learned is the second
+    half, continuity. Identifying things, and finding the facts worth keeping about them, is
+    still ahead. These are the questions:
+  </p>
+  <ol>
+    <li>Where do facts such as "what is next to me" come from, if they are not given?</li>
+    <li>Which facts are worth putting together in a row, when trying every combination is not possible?</li>
+    <li>How do things other than the agent enter the state, and how are they grouped into kinds?</li>
+    <li>Which built-in notions are enough for several games: thing, place, same, direction, distance, before and after?</li>
+    <li>Which parts of a game can be found, and which have to be told, such as castling being forbidden once the king has moved?</li>
+  </ol>
+
+  <h2>Next</h2>
+  <p>
+    Part 2 works backwards. For each world we first write the continuities by hand, in whatever
+    facts make them fewest. Then we ask what an agent would need in order to arrive at them on
+    its own.
+  </p>
+</article>

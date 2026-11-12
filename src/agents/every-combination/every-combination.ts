@@ -4,7 +4,7 @@ import { pick } from '../../core/random';
 import type { Action, State } from '../../core/state';
 import type { Explorer, Mind, Predictor, Storage } from '../parts';
 
-// Part 1, last stage. Nothing is chosen in advance. One move is a set of facts
+// Nothing is chosen in advance. One move is a set of facts
 // seen together: the action, the state before, the state after and the change.
 // Every combination of those facts is written as its own row, with a count of
 // how often those facts were seen together. No fact is set apart as the
@@ -13,7 +13,7 @@ import type { Explorer, Mind, Predictor, Storage } from '../parts';
 // This is for looking at what the store turns into, not for being small. With
 // n facts a move writes 2^n - 1 rows.
 //
-// Predicting and curiosity ask the same two questions as stages 3 to 5, so the
+// Predicting and curiosity ask the same two questions as the two-level agent, so the
 // agent behaves exactly as it did there. Only what is stored has changed.
 
 /** Rows here have nothing set apart as "what followed": the facts are the row. */
@@ -111,7 +111,7 @@ export const everyCombinationStorage: Storage = {
   },
 };
 
-/** The same rule as stages 3 to 5: the exact case if seen, otherwise the action's usual change. */
+/** The same rule as the two-level agent: the exact case if seen, otherwise the action's usual change. */
 export const exactThenUsualChange: Predictor = {
   predict(mind, state, action) {
     const n = names(mind, state);
@@ -140,7 +140,7 @@ export const exactThenUsualChange: Predictor = {
 };
 
 /**
- * The same curiosity as stages 3 to 5. Zero once this exact case has been
+ * The same curiosity as the two-level agent. Zero once this exact case has been
  * seen, or once the action's usual change has been seen `threshold` times.
  * Otherwise one divided by the number of times it has been seen.
  */

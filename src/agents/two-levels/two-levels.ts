@@ -4,7 +4,7 @@ import { pick } from '../../core/random';
 import type { Action, State } from '../../core/state';
 import type { Explorer, Mind, Predictor, Storage } from '../parts';
 
-// Stages 3 and 4. Every observation is stored at two levels of generality:
+// The two-level agent. Every observation is stored at two levels of generality:
 // what the action does in general, and what it did in this exact state.
 // Prediction and curiosity read those same two levels, so the three parts
 // live together here.

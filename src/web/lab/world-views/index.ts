@@ -19,6 +19,8 @@ export interface Scene {
    * ones carried over from elsewhere.
    */
   stays: 'seen' | 'expected';
+  /** Cells to mark as the ones a chosen row speaks for. */
+  spoken: State[];
 }
 
 /** A drawing of one kind of world. Each kind of world brings its own. */

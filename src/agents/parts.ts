@@ -43,6 +43,11 @@ export interface ExploreChoice {
   scores: { action: Action; curiosity: number }[];
   /** True when nothing here was interesting and the action was picked at random. */
   random: boolean;
+  /**
+   * Set when the action is a step on the way to somewhere else: the place
+   * where the move the agent is curious about will be made.
+   */
+  heading?: State;
 }
 
 /** How far the agent is from trusting what it knows about one action. */

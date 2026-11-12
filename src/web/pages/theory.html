@@ -1,23 +1,23 @@
-<article class="prose" style="--stage: '1'">
-  <p class="kicker">Stage 01</p>
-  <h1>Background theory</h1>
+<article class="prose" style="--stage: '0'">
+  <h1>Identity Continuity</h1>
 
-  <p class="lead">
-    The aim is one agent. It is not a language model and it is not trained in advance. It starts
-    with no knowledge of a world, learns how that world works by watching it or by trying things,
-    and then acts in it. The same agent should do this for a line, a grid and many board games,
-    and what it has learned should be readable.
+  <p>
+    How does the human mind make sense of the world? Our conjecture is that we do two things.
+    First, we identify something. Then we apply continuity to it: after something has happened
+    to it, we still recognise it as the same thing.
+  </p>
+  <p>
+    This project goes deep into that idea. We want to see whether it can be turned into a
+    general engine: one that learns about the world it is in, and can successfully use what it
+    has learned.
   </p>
 
   <h2>Identity</h2>
   <p>
-    An identity is a label the observer assigns to part of the world: "this is a thing". The world
-    does not hand it over. Physics has atoms, and the observer decides there is a ship.
-  </p>
-  <p>
-    The Ship of Theseus shows this. Replace every plank and ask whether it is the same ship. The
-    question has no answer in the planks, because "ship" was never in them. The paradox is not a
-    problem to solve. It shows how cognition works.
+    There is a well-known thought experiment called the Ship of Theseus. Theseus has a ship, and over the years its parts wear out and are
+    replaced one at a time, until none of the original is left. We still call it Theseus's
+    ship. Now suppose someone kept all the old parts and built a second ship out of them. Which
+    of the two is Theseus's ship?
   </p>
 
   <figure class="fig">
@@ -100,156 +100,336 @@
       <text class="f-tm" x="398" y="155" text-anchor="middle">most parts new</text>
       <text class="f-tm" x="556" y="155" text-anchor="middle">every part new</text>
     </svg>
-    <figcaption><b>Fig 1.1</b>Hatched parts have been replaced. Nothing in the material stays the same from T0 to T3. The identity does.</figcaption>
+    <figcaption><b>Fig 1.1</b>Hatched parts have been replaced. By T3 none of the original material is left, and we still call it the same ship.</figcaption>
   </figure>
+
+  <p>
+    We can argue either way, and that is what makes the puzzle useful. In the real world there
+    is no such thing as Theseus's ship, and no such thing as a plank. There is only a
+    collection of matter that we have identified, in our heads, as one unit. That is what we
+    mean by <strong>identity</strong>: something we have picked out and labelled as a thing.
+  </p>
+  <p>
+    Which ship is his depends on what we choose to follow: the ship that was sailed and
+    repaired, or the original material. Following a thing through change like this is the
+    second step, continuity.
+  </p>
 
   <h2>Continuity</h2>
   <p>
-    A continuity is a learned pattern that links states across time: how an identified thing
-    changes from one moment to the next, often in response to an action. Each continuity has two
-    properties.
-  </p>
-  <ul>
-    <li><strong>Generality:</strong> how widely it applies.</li>
-    <li><strong>Strength:</strong> how often it has been observed.</li>
-  </ul>
-
-  <h2>Identity and continuity cannot be separated</h2>
-  <p>
-    Continuity is what tells you whether this is the same item as before. Identity is what a
-    continuity is learned about. Each is needed to derive the other, so they are treated as one
-    mechanism, not two.
-  </p>
-
-  <h2>Hierarchy</h2>
-  <p>
-    Knowledge is organised from general to specific. When both apply, the specific one overrides
-    the general one.
+    Here is another thought experiment. Let's assume there is a blue curtain. A red ball rolls in on
+    one side, and a blue ball rolls out on the other.
   </p>
   <p>
-    Generality runs along more than one direction. A rule can be general or specific about
-    <em>when</em> it applies, and also about <em>who</em> it applies to: every thing, every thing
-    of one kind, or one individual. If all pawns move the same way, "pawn" is a level in the
-    hierarchy. A kind is the set of things that one continuity covers.
+    We did not see what happened behind the curtain. Even so, we take it to be the same ball,
+    and we take the curtain to have turned it blue. We do not imagine that the red ball
+    vanished and a different one appeared.
+  </p>
+  <p>
+    Now assume a second curtain, a striped one. A ball rolls in and a cube rolls out. We read
+    it the same way: it is the same thing, it is a cube now, and the striped curtain did that.
   </p>
 
   <figure class="fig">
-    <svg viewBox="0 0 640 250" role="img" aria-label="A chart with two axes. Across: when a rule applies, from always to exactly here. Up: who it applies to, from every thing to one individual. Six example rules are placed on it.">
-      <path class="f-rule f-dash" d="M120,176 H620 M120,116 H620 M120,56 H620 M200,30 V214 M370,30 V214 M540,30 V214" />
-      <path class="f-ink" d="M120,30 V214 H620" />
-
-      <text class="f-th" x="120" y="18">WHO IT APPLIES TO</text>
-      <text class="f-th" x="620" y="246" text-anchor="end">WHEN IT APPLIES</text>
-
-      <text class="f-tm" x="112" y="179" text-anchor="end">every thing</text>
-      <text class="f-tm" x="112" y="119" text-anchor="end">one kind</text>
-      <text class="f-tm" x="112" y="59" text-anchor="end">one individual</text>
-
-      <text class="f-tm" x="200" y="230" text-anchor="middle">always</text>
-      <text class="f-tm" x="370" y="230" text-anchor="middle">in some situation</text>
-      <text class="f-tm" x="540" y="230" text-anchor="middle">exactly here</text>
-
-      <rect class="f-solid" x="196.5" y="172.5" width="7" height="7" />
-      <text class="f-t" x="210" y="179">one change per turn</text>
-
-      <rect class="f-solid" x="196.5" y="112.5" width="7" height="7" />
-      <text class="f-t" x="210" y="119">pawns move forward</text>
-
-      <rect class="f-solid" x="366.5" y="172.5" width="7" height="7" />
-      <text class="f-t" x="380" y="179">nothing enters an occupied cell</text>
-
-      <rect class="f-solid" x="366.5" y="112.5" width="7" height="7" />
-      <text class="f-t" x="380" y="119">a pawn on its first row may move two</text>
-
-      <rect class="f-solid" x="366.5" y="52.5" width="7" height="7" />
-      <text class="f-t" x="360" y="59" text-anchor="end">this rook has moved: no castling</text>
-
-      <rect class="f-accent-fill" x="536.5" y="52.5" width="7" height="7" />
-      <text class="f-ta" x="540" y="44" text-anchor="middle">this pawn, blocked right now</text>
-    </svg>
-    <figcaption><b>Fig 1.2</b>Generality has two directions. Neither "pawns move forward" nor "nothing enters an occupied cell" sits under the other.</figcaption>
-  </figure>
-
-  <h2>Curiosity</h2>
-  <p>
-    Curiosity is the inverse of how complete the agent's knowledge is. It drives the agent to try
-    what it knows least about, it falls as observations accumulate, and below a threshold the
-    agent is confident and stops exploring. When the agent has nothing to watch, curiosity is how
-    it comes to understand a world.
-  </p>
-
-  <h2>Surprise</h2>
-  <p>
-    A surprise is a prediction that turns out wrong. The agent responds by learning a more
-    specific rule for that case and planning again. This is how it adapts to walls, edges and
-    exceptions.
-  </p>
-
-  <figure class="fig">
-    <svg viewBox="0 0 640 150" role="img" aria-label="A loop: predict, act, compare. If the result is as predicted, the count goes up. If it differs, that is a surprise and the case is stored. Either way the agent plans again from where it is.">
+    <svg viewBox="0 0 640 150" role="img" aria-label="Two curtains. A red ball rolls behind the blue curtain and a blue ball rolls out. A red ball rolls behind the striped curtain and a red cube rolls out.">
       <defs>
-        <marker id="f13-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+        <marker id="fc-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
           <path class="f-solid" d="M0,0.5 L8,4 L0,7.5 Z" />
         </marker>
       </defs>
-
-      <rect class="f-solid" x="24" y="57" width="6" height="6" />
-      <text class="f-t" x="36" y="63">predict</text>
-      <path class="f-thin" marker-end="url(#f13-arrow)" d="M86,60 H118" />
-
-      <rect class="f-solid" x="126" y="57" width="6" height="6" />
-      <text class="f-t" x="138" y="63">act</text>
-      <path class="f-thin" marker-end="url(#f13-arrow)" d="M164,60 H196" />
-
-      <rect class="f-solid" x="204" y="57" width="6" height="6" />
-      <text class="f-t" x="216" y="63">compare</text>
-      <path class="f-thin" d="M266,60 H290 M290,30 V96" />
-      <path class="f-thin" marker-end="url(#f13-arrow)" d="M290,30 H318" />
-      <path class="f-thin" marker-end="url(#f13-arrow)" d="M290,96 H318" />
-
-      <rect class="f-solid" x="326" y="27" width="6" height="6" />
-      <text class="f-t" x="338" y="33">as predicted</text>
-      <path class="f-thin" marker-end="url(#f13-arrow)" d="M418,30 H446" />
-      <rect class="f-solid" x="454" y="27" width="6" height="6" />
-      <text class="f-t" x="466" y="33">count + 1</text>
-
-      <rect class="f-alarm-fill" x="326" y="93" width="6" height="6" />
-      <text class="f-tb" x="338" y="99">differs: surprise</text>
-      <path class="f-thin" marker-end="url(#f13-arrow)" d="M448,96 H476" />
-      <rect class="f-solid" x="484" y="93" width="6" height="6" />
-      <text class="f-t" x="496" y="99">store this case</text>
-
-      <path class="f-thin" d="M528,30 H612 V128 M594,96 H612" />
-      <path class="f-thin" marker-end="url(#f13-arrow)" d="M612,128 H27 V70" />
-      <text class="f-tm" x="320" y="143" text-anchor="middle">plan again from where the agent is</text>
+      <text class="f-th" x="160" y="18" text-anchor="middle">THE BLUE CURTAIN</text>
+      <rect class="f-curtain-blue" x="137" y="32" width="46" height="68" />
+      <path class="f-fold-blue" d="M144.7,32 V100 M152.3,32 V100 M160.0,32 V100 M167.7,32 V100 M175.3,32 V100" />
+      <path class="f-ink" d="M131,32 H189" />
+      <circle class="f-red" cx="84" cy="66" r="10" />
+      <path class="f-thin" marker-end="url(#fc-arrow)" d="M98,66 H131" />
+      <path class="f-thin" marker-end="url(#fc-arrow)" d="M189,66 H222" />
+      <circle class="f-blue" cx="236" cy="66" r="10" />
+      <text class="f-t" x="160" y="124" text-anchor="middle">a red ball rolls in, a blue ball rolls out</text>
+      <text class="f-tm" x="160" y="140" text-anchor="middle">nobody sees behind it</text>
+      <text class="f-th" x="480" y="18" text-anchor="middle">THE STRIPED CURTAIN</text>
+      <rect class="f-paper" x="457" y="32" width="46" height="68" />
+      <rect class="f-stripe" x="457.5" y="37" width="45" height="4" />
+      <rect class="f-stripe" x="457.5" y="47" width="45" height="4" />
+      <rect class="f-stripe" x="457.5" y="57" width="45" height="4" />
+      <rect class="f-stripe" x="457.5" y="67" width="45" height="4" />
+      <rect class="f-stripe" x="457.5" y="77" width="45" height="4" />
+      <rect class="f-stripe" x="457.5" y="87" width="45" height="4" />
+      <path class="f-ink" d="M451,32 H509" />
+      <circle class="f-red" cx="404" cy="66" r="10" />
+      <path class="f-thin" marker-end="url(#fc-arrow)" d="M418,66 H451" />
+      <path class="f-thin" marker-end="url(#fc-arrow)" d="M509,66 H542" />
+      <rect class="f-red" x="546" y="61" width="15" height="15" /><polygon class="f-red" points="546,61 551,56 566,56 561,61" /><polygon class="f-red" points="561,61 566,56 566,71 561,76" />
+      <text class="f-t" x="480" y="124" text-anchor="middle">a ball rolls in, a cube rolls out</text>
+      <text class="f-tm" x="480" y="140" text-anchor="middle">nobody sees behind it</text>
     </svg>
-    <figcaption><b>Fig 1.3</b>Every step is a prediction that gets checked. A match adds strength. A mismatch adds a more specific rule.</figcaption>
+    <figcaption><b>Fig 1.2</b>We only see what goes in and what comes out. That it is the same thing, and that the curtain changed it, is our assumption.</figcaption>
   </figure>
 
-  <h2>Reasoning as stacked continuity</h2>
   <p>
-    Reasoning needs continuity. Hold identities stable, chain continuities one after another, and
-    let each step build on the one before. Planning a route is the first example: the agent
-    reaches a conclusion about a place it has never been.
+    This is <strong>continuity</strong>. We identify what came out as the same thing that went
+    in, and we form an idea of what happened to it in between. That idea also tells us what to
+    expect the next time something goes through.
   </p>
 
-  <h2>Uncertainty is incomplete state</h2>
+  <h2>Hierarchy of assumptions</h2>
   <p>
-    In a deterministic world, if the same situation leads to different outcomes, some part of the
-    state is missing from the agent's representation. Uncertainty is therefore a signal to
-    represent more, not a property of the world.
+    We never saw behind the curtain, so what we hold about it is an
+    <strong>assumption</strong>. We assume it was the same ball, and we assume the curtain will
+    do the same thing again. Each time that turns out right, the assumption gets stronger.
+  </p>
+  <p>
+    How much does one assumption cover? We saw one red ball come out blue. Suppose we now have
+    a white ball and want to turn it blue, or a cat. Would the curtain work? It depends on how
+    far we take what we saw, and we can take it at several levels, from general to specific:
+  </p>
+  <ul>
+    <li>Any object that goes through comes out blue.</li>
+    <li>Any ball that goes through comes out blue.</li>
+    <li>A red ball that goes through comes out blue.</li>
+  </ul>
+  <p>
+    We hold all of these together, and that is the <strong>hierarchy of assumptions</strong>.
+    The general ones are what let us answer for things we have never tried: "any ball" covers
+    the white ball, and "any object" covers the cat.
+  </p>
+  <p>
+    Now suppose we try a gold ball, and it comes out gold. We keep "any ball comes out blue",
+    because it is still right for every other ball. Beneath it we add what we just saw, "the
+    gold ball comes out gold", and for the gold ball we follow that one. A more specific
+    assumption like this is only added when an experiment shows it.
   </p>
 
-  <h2>Learning while operating</h2>
+  <figure class="fig">
+    <svg viewBox="0 0 640 212" role="img" aria-label="Four assumptions from general to specific. Any object that goes through the blue curtain comes out blue. Any ball comes out blue. A red ball comes out blue. These three were taken together from one look. The fourth was seen when the gold ball was tried: it comes out gold.">
+      <defs>
+        <marker id="fh-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="f-solid" d="M0,0.5 L8,4 L0,7.5 Z" />
+        </marker>
+      </defs>
+      <text class="f-th" x="16" y="24">MORE GENERAL</text>
+      <path class="f-ink" d="M112,21 H520" />
+      <path class="f-solid" d="M520,16.5 L530,21 L520,25.5 Z" />
+      <text class="f-th" x="624" y="24" text-anchor="end">MORE SPECIFIC</text>
+      <text class="f-t" x="16" y="50">Any object</text>
+      <text class="f-t" x="16" y="64">comes out blue.</text>
+      <rect class="f-curtain-blue" x="68" y="84" width="32" height="84" />
+      <path class="f-fold-blue" d="M76.0,84 V168 M84.0,84 V168 M92.0,84 V168" />
+      <path class="f-ink" d="M62,84 H106" />
+      <circle class="f-red" cx="28" cy="100" r="8" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M42,100 H62" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M106,100 H126" />
+      <circle class="f-blue" cx="140" cy="100" r="8" />
+      <g transform="translate(28,126) scale(0.8)"><rect class="f-grey" x="-10" y="-5" width="15" height="15" /><polygon class="f-grey" points="-10,-5 -5,-10 10,-10 5,-5" /><polygon class="f-grey" points="5,-5 10,-10 10,5 5,10" /></g>
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M42,126 H62" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M106,126 H126" />
+      <g transform="translate(140,126) scale(0.8)"><rect class="f-blue" x="-10" y="-5" width="15" height="15" /><polygon class="f-blue" points="-10,-5 -5,-10 10,-10 5,-5" /><polygon class="f-blue" points="5,-5 10,-10 10,5 5,10" /></g>
+      <g transform="translate(28,152)"><polygon class="f-paper" points="-8,-3 -7,-11 -1,-6" /><polygon class="f-paper" points="8,-3 7,-11 1,-6" /><circle class="f-paper" cx="0" cy="1" r="8" /></g>
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M42,152 H62" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M106,152 H126" />
+      <g transform="translate(140,152)"><polygon class="f-blue" points="-8,-3 -7,-11 -1,-6" /><polygon class="f-blue" points="8,-3 7,-11 1,-6" /><circle class="f-blue" cx="0" cy="1" r="8" /></g>
+      <text class="f-t" x="172" y="50">Any ball</text>
+      <text class="f-t" x="172" y="64">comes out blue.</text>
+      <rect class="f-curtain-blue" x="224" y="84" width="32" height="84" />
+      <path class="f-fold-blue" d="M232.0,84 V168 M240.0,84 V168 M248.0,84 V168" />
+      <path class="f-ink" d="M218,84 H262" />
+      <circle class="f-red" cx="184" cy="100" r="8" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M198,100 H218" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M262,100 H282" />
+      <circle class="f-blue" cx="296" cy="100" r="8" />
+      <circle class="f-paper" cx="184" cy="126" r="8" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M198,126 H218" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M262,126 H282" />
+      <circle class="f-blue" cx="296" cy="126" r="8" />
+      <circle class="f-green" cx="184" cy="152" r="8" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M198,152 H218" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M262,152 H282" />
+      <circle class="f-blue" cx="296" cy="152" r="8" />
+      <text class="f-t" x="328" y="50">A red ball</text>
+      <text class="f-t" x="328" y="64">comes out blue.</text>
+      <rect class="f-curtain-blue" x="380" y="84" width="32" height="84" />
+      <path class="f-fold-blue" d="M388.0,84 V168 M396.0,84 V168 M404.0,84 V168" />
+      <path class="f-ink" d="M374,84 H418" />
+      <circle class="f-red" cx="340" cy="126" r="8" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M354,126 H374" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M418,126 H438" />
+      <circle class="f-blue" cx="452" cy="126" r="8" />
+      <text class="f-t" x="484" y="50">The gold ball</text>
+      <text class="f-t" x="484" y="64">comes out gold.</text>
+      <rect class="f-curtain-blue" x="536" y="84" width="32" height="84" />
+      <path class="f-fold-blue" d="M544.0,84 V168 M552.0,84 V168 M560.0,84 V168" />
+      <path class="f-ink" d="M530,84 H574" />
+      <circle class="f-gold" cx="496" cy="126" r="8" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M510,126 H530" />
+      <path class="f-thin" marker-end="url(#fh-arrow)" d="M574,126 H594" />
+      <circle class="f-gold" cx="608" cy="126" r="8" />
+      <path class="f-rule" d="M160,42 V172 M316,42 V172 M472,42 V172" />
+      <path class="f-thin" d="M16,182 V187 H452 V182" />
+      <text class="f-tm" x="234" y="204" text-anchor="middle">taken together, from one look at one red ball</text>
+      <path class="f-thin" d="M484,182 V187 H624 V182" />
+      <text class="f-tm" x="554" y="204" text-anchor="middle">seen when we tried it</text>
+    </svg>
+    <figcaption><b>Fig 1.3</b>From general to specific. The first three come from one look and agree. The fourth is there because we tried the gold ball and saw it, and we follow it for the gold ball.</figcaption>
+  </figure>
+
   <p>
-    The agent has no separate training phase. Every observation changes what it knows, including
-    observations made while it is working toward a goal.
+    When a more specific assumption applies, we follow it. Otherwise we fall back on a more
+    general one. This is also how we handle being wrong: we add something more specific beneath
+    what we already believed, and the rest stays in place. This way every assumption in the
+    hierarchy can be fully true within its own range, and we never have to settle for one that
+    is only true most of the time.
   </p>
 
-  <h2>What is built in</h2>
+  <h2>Curiosity</h2>
   <p>
-    Some structure has to exist before any learning can happen. The framework is itself such
-    structure, and so are a few primitives: distance, direction, cycles, containment and
-    causation. Stating them openly is part of the theory.
+    Now assume a third curtain, a dotted one, and nobody has told us what it does. We want to
+    roll the ball through and see.
+  </p>
+  <p>
+    That is <strong>curiosity</strong>. We have something we have identified, the ball, and
+    something that could happen to it, but no assumption about the result. Curiosity is that
+    missing assumption.
+  </p>
+  <p>
+    Once we have rolled the ball through, we have an assumption and we are less curious. After
+    a few more times the assumption is strong, and our attention moves to something we know
+    less about.
+  </p>
+  <p>
+    The hierarchy matters here too. When we only have a general assumption about something, and
+    nothing specific, some curiosity remains. After the gold ball came out gold, we want to try
+    a silver one.
+  </p>
+
+  <h2>Reasoning</h2>
+  <p>
+    Now a question. We have a red ball and we want a blue cube. How do we get one?
+  </p>
+  <p>
+    Most people answer straight away: put it through the blue curtain, and then through the
+    striped one.
+  </p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 108" role="img" aria-label="A red ball goes through the blue curtain and becomes a blue ball, then through the striped curtain and becomes a blue cube.">
+      <defs>
+        <marker id="fq-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="f-solid" d="M0,0.5 L8,4 L0,7.5 Z" />
+        </marker>
+      </defs>
+      <circle class="f-red" cx="56" cy="58" r="10" />
+      <text class="f-tm" x="56" y="98" text-anchor="middle">what you have</text>
+      <path class="f-thin" marker-end="url(#fq-arrow)" d="M74,58 H152" />
+      <rect class="f-curtain-blue" x="160" y="30" width="40" height="56" />
+      <path class="f-fold-blue" d="M168.0,30 V86 M176.0,30 V86 M184.0,30 V86 M192.0,30 V86" />
+      <path class="f-ink" d="M154,30 H206" />
+      <text class="f-t" x="180" y="18" text-anchor="middle">the blue curtain</text>
+      <path class="f-thin" marker-end="url(#fq-arrow)" d="M208,58 H290" />
+      <circle class="f-blue" cx="308" cy="58" r="10" />
+      <path class="f-thin" marker-end="url(#fq-arrow)" d="M326,58 H404" />
+      <rect class="f-paper" x="412" y="30" width="40" height="56" />
+      <rect class="f-stripe" x="412.5" y="35" width="39" height="4" />
+      <rect class="f-stripe" x="412.5" y="45" width="39" height="4" />
+      <rect class="f-stripe" x="412.5" y="55" width="39" height="4" />
+      <rect class="f-stripe" x="412.5" y="65" width="39" height="4" />
+      <rect class="f-stripe" x="412.5" y="75" width="39" height="4" />
+      <path class="f-ink" d="M406,30 H458" />
+      <text class="f-t" x="432" y="18" text-anchor="middle">the striped curtain</text>
+      <path class="f-thin" marker-end="url(#fq-arrow)" d="M460,58 H560" />
+      <rect class="f-blue" x="570" y="53" width="15" height="15" /><polygon class="f-blue" points="570,53 575,48 590,48 585,53" /><polygon class="f-blue" points="585,53 590,48 590,63 585,68" />
+      <text class="f-tm" x="580" y="98" text-anchor="middle">what you want</text>
+    </svg>
+    <figcaption><b>Fig 1.4</b>The answer most people give. We have never seen the whole sequence happen.</figcaption>
+  </figure>
+
+  <p>
+    Nobody has shown us a blue cube, or anything passing through two curtains. We got there by
+    treating it as one thing the whole way, and applying our assumptions one after another,
+    each from where the last one left it. That is <strong>reasoning</strong>: continuity
+    applied again and again until it reaches what we want.
+  </p>
+
+  <h2>The goal</h2>
+  <p>
+    The goal is an engine that works the same way. It is not a language model and it is not
+    trained in advance. We put it in a world it knows nothing about. It explores because it has
+    no assumptions yet, it builds a hierarchy of assumptions from what it sees, and it uses
+    them in sequence to reach the goals we give it. It keeps learning the whole time, and
+    because what it holds are assumptions, we can read them.
+  </p>
+  <p>
+    We start with small worlds: a line, a grid, and a grid with a wall. By the end of Part 1
+    the engine learns all three from nothing and reaches its goals in every run. What it ends
+    up holding about the wall has the same shape as the gold ball: one general continuity, with
+    more specific ones beneath it.
+  </p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 250" role="img" aria-label="Three small grids. First: going right moves one cell right, shaded in every cell except the right-hand column and the cell beside the wall. Second: the right-hand column is shaded, where going right does nothing. Third: the one cell beside the wall is shaded, where going right does nothing.">
+      <rect class="f-shade" x="16" y="84" width="26" height="26" />
+      <rect class="f-shade" x="42" y="84" width="26" height="26" />
+      <rect class="f-shade" x="68" y="84" width="26" height="26" />
+      <rect class="f-shade" x="94" y="84" width="26" height="26" />
+      <rect class="f-shade" x="120" y="84" width="26" height="26" />
+      <rect class="f-shade" x="16" y="110" width="26" height="26" />
+      <rect class="f-shade" x="42" y="110" width="26" height="26" />
+      <rect class="f-shade" x="68" y="110" width="26" height="26" />
+      <rect class="f-solid" x="120" y="110" width="26" height="26" />
+      <rect class="f-shade" x="16" y="136" width="26" height="26" />
+      <rect class="f-shade" x="42" y="136" width="26" height="26" />
+      <rect class="f-shade" x="68" y="136" width="26" height="26" />
+      <rect class="f-shade" x="94" y="136" width="26" height="26" />
+      <rect class="f-shade" x="120" y="136" width="26" height="26" />
+      <rect class="f-shade" x="16" y="162" width="26" height="26" />
+      <rect class="f-shade" x="42" y="162" width="26" height="26" />
+      <rect class="f-shade" x="68" y="162" width="26" height="26" />
+      <rect class="f-shade" x="94" y="162" width="26" height="26" />
+      <rect class="f-shade" x="120" y="162" width="26" height="26" />
+      <path class="f-rule" d="M42,84 V188 M68,84 V188 M94,84 V188 M120,84 V188 M146,84 V188 M16,110 H172 M16,136 H172 M16,162 H172" />
+      <rect class="f-ink" x="16" y="84" width="156" height="104" />
+      <path class="f-solid" d="M55.0,142.0 L62.0,149.0 L55.0,156.0 L48.0,149.0 Z" />
+      <path class="f-ink" d="M64.0,149.0 H78.0" /><path class="f-solid" d="M76.0,145.0 L83.0,149.0 L76.0,153.0 Z" />
+      <rect class="f-shade" x="366" y="84" width="26" height="26" />
+      <rect class="f-solid" x="340" y="110" width="26" height="26" />
+      <rect class="f-shade" x="366" y="110" width="26" height="26" />
+      <rect class="f-shade" x="366" y="136" width="26" height="26" />
+      <rect class="f-shade" x="366" y="162" width="26" height="26" />
+      <path class="f-rule" d="M262,84 V188 M288,84 V188 M314,84 V188 M340,84 V188 M366,84 V188 M236,110 H392 M236,136 H392 M236,162 H392" />
+      <rect class="f-ink" x="236" y="84" width="156" height="104" />
+      <path class="f-solid" d="M379.0,142.0 L386.0,149.0 L379.0,156.0 L372.0,149.0 Z" />
+      <path class="f-bar" d="M389,140 V158" />
+      <rect class="f-accent-shade" x="534" y="110" width="26" height="26" />
+      <rect class="f-solid" x="560" y="110" width="26" height="26" />
+      <path class="f-rule" d="M482,84 V188 M508,84 V188 M534,84 V188 M560,84 V188 M586,84 V188 M456,110 H612 M456,136 H612 M456,162 H612" />
+      <rect class="f-ink" x="456" y="84" width="156" height="104" />
+      <path class="f-solid" d="M547.0,116.0 L554.0,123.0 L547.0,130.0 L540.0,123.0 Z" />
+      <text class="f-th" x="16" y="24">MORE GENERAL</text>
+      <path class="f-ink" d="M112,21 H520" />
+      <path class="f-solid" d="M520,16.5 L530,21 L520,25.5 Z" />
+      <text class="f-th" x="624" y="24" text-anchor="end">MORE SPECIFIC</text>
+      <text class="f-t" x="16" y="48">Going right moves me</text>
+      <text class="f-t" x="16" y="62">one cell to the right.</text>
+      <text class="f-t" x="236" y="48">At the right edge,</text>
+      <text class="f-t" x="236" y="62">going right does nothing.</text>
+      <text class="f-t" x="456" y="48">Beside the wall,</text>
+      <text class="f-t" x="456" y="62">going right does nothing.</text>
+      <path class="f-muted f-dash" d="M182,136.0 H226" />
+      <text class="f-tm" x="204.0" y="129.0" text-anchor="middle"></text>
+      <path class="f-muted f-dash" d="M402,136.0 H446" />
+      <text class="f-tm" x="424.0" y="129.0" text-anchor="middle"></text>
+      <text class="f-tm" x="16" y="208">true in the shaded cells</text>
+      <text class="f-tm" x="236" y="208">true in this column</text>
+      <text class="f-tm" x="456" y="208">true in this one cell</text>
+      <rect class="f-solid" x="16" y="224" width="10" height="10" /><text class="f-tm" x="32" y="233">a wall</text>
+    </svg>
+    <figcaption><b>Fig 1.5</b>The shape of what the engine holds about going right, drawn on a small grid with a wall. Where a more specific continuity applies, the engine follows it.</figcaption>
+  </figure>
+
+  <p>
+    So far the engine is given its one identity, itself. Learning to identify things on its own
+    is still ahead. Board games come after that. We want an engine that can watch a few games
+    of chess without knowing anything about it, work out how the pieces move, and then play. We
+    are aiming for understanding more than strength: a player like a child after a few
+    evenings, who can then do the same with the next game.
   </p>
 </article>

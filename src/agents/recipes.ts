@@ -7,6 +7,8 @@ import {
   exactThenUsualChange,
 } from './every-combination/every-combination';
 import { curiosityFromBacking, everyRowPredictor, everyRowStorage } from './every-row/every-row';
+import { countOnceStorage, fromCountsPredictor, seekLeastSure, throughThinRows } from './from-counts/from-counts';
+import { hierarchyPredictor, movesStorage, seekUntried, throughGuesses } from './hierarchy/hierarchy';
 import { searchThenGreedy } from './planning/search-then-greedy';
 import { coordinates } from './representations/coordinates';
 import { countCuriosity, specificThenGeneral, twoLevelStorage } from './two-levels/two-levels';
@@ -24,7 +26,7 @@ export interface Recipe {
   build(shape: WorldShape, random?: Random): Agent;
 }
 
-/** Stages 3 and 4: the port of the original engine. */
+/** The first agent: the port of the original engine. */
 export const twoLevels: Recipe = {
   id: 'two-levels',
   label: 'Two levels',
@@ -45,7 +47,7 @@ export const twoLevels: Recipe = {
 };
 
 /**
- * The last stage of part 1. It acts exactly as `twoLevels` does. What differs
+ * It acts exactly as `twoLevels` does. What differs
  * is what it writes down: every combination of the facts of each move.
  */
 export const everyCombination: Recipe = {
@@ -68,7 +70,7 @@ export const everyCombination: Recipe = {
 };
 
 /**
- * Stage 8. The store of stage 7, read without naming any combination: every
+ * The store of `everyCombination`, read without naming any combination: every
  * row that could answer has a say, and one rule decides between them.
  */
 export const everyRow: Recipe = {
@@ -90,7 +92,56 @@ export const everyRow: Recipe = {
     ),
 };
 
-export const recipes: Recipe[] = [twoLevels, everyCombination, everyRow];
+/**
+ * Built by hand, as a target. A hierarchy in which every row holds: a row says what an action
+ * does, and where it fails a more specific row beneath it speaks first.
+ */
+export const hierarchy: Recipe = {
+  id: 'hierarchy',
+  label: 'Every row holds',
+  summary:
+    'Builds a hierarchy of rows for each action. An exception speaks before the row above it, so every row holds.',
+  build: (shape, random) =>
+    new Agent(
+      shape.actions,
+      {
+        representation: coordinates(shape.stateParts),
+        storage: movesStorage,
+        predictor: hierarchyPredictor,
+        explorer: seekUntried(),
+        // Knowing where the wall is, the way round it is longer than the 100 places
+        // the earlier stages search. The search is the same, with more room.
+        planner: throughGuesses(searchThenGreedy({ maxVisited: 2000 }), 5),
+      },
+      random,
+    ),
+};
+
+/**
+ * A hierarchy read from the counts of every combination, with no procedure
+ * that builds one: an exception speaks first, otherwise the row with the best
+ * standing does.
+ */
+export const fromCounts: Recipe = {
+  id: 'from-counts',
+  label: 'Read from the counts',
+  summary:
+    'Stores every combination, counting each different move once. An exception speaks first, otherwise the best standing.',
+  build: (shape, random) =>
+    new Agent(
+      shape.actions,
+      {
+        representation: coordinates(shape.stateParts),
+        storage: countOnceStorage,
+        predictor: fromCountsPredictor,
+        explorer: seekLeastSure(),
+        planner: throughThinRows(searchThenGreedy({ maxVisited: 2000 }), 5),
+      },
+      random,
+    ),
+};
+
+export const recipes: Recipe[] = [twoLevels, everyCombination, everyRow, hierarchy, fromCounts];
 
 export function findRecipe(id: string): Recipe | undefined {
   return recipes.find((recipe) => recipe.id === id);

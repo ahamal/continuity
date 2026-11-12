@@ -5,8 +5,8 @@ import type { Action, State } from '../../core/state';
 import { combinations, everyCombinationStorage, timesSeen } from '../every-combination/every-combination';
 import type { Explorer, Mind, Predictor, Storage } from '../parts';
 
-// Part 1, stage 8. The store is the same as stage 7: every combination of the
-// facts of each move. What changes is how it is read. Stage 7 read two
+// The store is the same as the every-combination agent's: every combination of the
+// facts of each move. What changes is how it is read. That agent read two
 // combinations that were named in the code. Here no combination is named. To
 // answer a question, every row that could answer it gets a say, and one rule
 // decides between them.
@@ -103,7 +103,7 @@ function backing(mind: Mind, knownFacts: Facts, ask: string): number {
 
 // ---- the parts ------------------------------------------------------------
 
-/** Stage 7's storage, plus the index this stage reads through. */
+/** The every-combination storage, plus the index this agent reads through. */
 export const everyRowStorage: Storage = {
   store(mind, before, action, next) {
     const writes = everyCombinationStorage.store(mind, before, action, next);

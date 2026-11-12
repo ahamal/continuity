@@ -25,7 +25,7 @@
   --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --cond: 'IBM Plex Sans Condensed', 'IBM Plex Sans', system-ui, sans-serif;
 
-  --side-width: 232px;
+  --side-width: 268px;
   --gutter: 20px;
 }
 
@@ -339,6 +339,25 @@ code {
 
 /* ---- figures ---------------------------------------------------------- */
 
+/* A quotation set apart from the text. */
+.quote {
+  margin: 4px 0 20px;
+  padding: 2px 0 2px 16px;
+  border-left: 2px solid var(--ink);
+}
+
+.quote p {
+  margin: 0;
+  font: italic 17px/1.45 var(--sans);
+}
+
+.quote footer {
+  margin-top: 4px;
+  color: var(--ink-2);
+  font: 11px var(--mono);
+  letter-spacing: 0.04em;
+}
+
 .fig {
   margin: 22px 0 26px;
 }
@@ -407,6 +426,23 @@ code {
   fill: var(--paper);
   stroke: var(--ink);
   stroke-width: 1;
+}
+
+/* Where a continuity is true, in a small grid. */
+.f-shade {
+  fill: color-mix(in srgb, var(--ink) 13%, transparent);
+}
+
+.f-accent-shade {
+  fill: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* A move that does nothing: a bar on the side it cannot pass. */
+.f-bar {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
 }
 
 .f-accent {
@@ -556,12 +592,25 @@ body[data-layout='lab'] .pager {
   stroke-width: 2;
 }
 
+/*
+  The header of a lab page. It is the same height and has the same columns on
+  every page, whatever the title and summary say: the title in a fixed column,
+  the summary in at most two lines, then the set-up controls.
+*/
 .lab-head {
-  display: flex;
+  display: grid;
+  flex: none;
+  grid-template-columns: 270px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 28px;
-  padding: 10px 18px;
+  gap: 24px;
+  height: 66px;
+  padding: 0 18px;
+  overflow: hidden;
   border-bottom: 1px solid var(--rule);
+}
+
+.lab-title {
+  min-width: 0;
 }
 
 .lab-head .kicker {
@@ -570,14 +619,21 @@ body[data-layout='lab'] .pager {
 
 .lab-head h1 {
   margin: 0;
+  overflow: hidden;
   font-size: 22px;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .lab-head .lead {
-  flex: 1;
-  max-width: 540px;
+  display: -webkit-box;
+  max-width: 560px;
+  max-height: 36.4px;
   margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   color: var(--ink-2);
   font-size: 13px;
   line-height: 1.4;
@@ -585,7 +641,7 @@ body[data-layout='lab'] .pager {
 
 .setup {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 8px 10px;
   margin-left: auto;
@@ -615,6 +671,95 @@ body[data-layout='lab'] .pager {
   display: flex;
   flex: 1;
   min-height: 0;
+}
+
+/*
+  A written page with small labs between its paragraphs. The text keeps the
+  reading width. A lab is wider than the text and a fixed height.
+*/
+.story {
+  counter-reset: section;
+}
+
+.story .prose {
+  counter-reset: none;
+}
+
+/* A lab runs the full width of the content, past the margins the text keeps. */
+.demo {
+  display: flex;
+  height: 640px;
+  margin: 26px -40px 8px -76px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  background: var(--bench);
+}
+
+/* A lab that is only a world is as wide as the text and sits in line with it. */
+.demo-solo {
+  max-width: 660px;
+  margin: 26px 0 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.demo-note {
+  max-width: 660px;
+  margin: 0 0 30px;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.lab-compact {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  padding: 0;
+  background: none;
+}
+
+.lab-solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lab-compact .world {
+  margin-top: 6px;
+}
+
+/* Two rows, always: the world picker, then what the agent is doing. */
+.compact-top {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px 0;
+}
+
+.compact-top .segmented button {
+  white-space: nowrap;
+}
+
+.compact-top .setup {
+  flex-wrap: wrap;
+}
+
+.reasons .re-what {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.reasons .re-expects {
+  color: var(--ink-2);
+}
+
+.compact-top .setup {
+  margin-left: 0;
+}
+
+.lab-compact .panel-controls .time-row {
+  margin-top: 8px;
 }
 
 .lab {
@@ -939,6 +1084,13 @@ body[data-layout='lab'] .pager {
   fill: color-mix(in srgb, var(--ink) 9%, transparent);
 }
 
+/* The cells a clicked row speaks for. */
+.spoken {
+  fill: color-mix(in srgb, var(--accent) 22%, transparent);
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+
 .layer-axis text {
   fill: var(--ink-3);
   font: 11px var(--mono);
@@ -1210,7 +1362,8 @@ body[data-layout='lab'] .pager {
 
 .timeline-label {
   flex: none;
-  width: 104px;
+  width: 132px;
+  white-space: nowrap;
   color: var(--ink-2);
   font: 12.5px var(--mono);
 }
@@ -1263,6 +1416,11 @@ body[data-layout='lab'] .pager {
 
 .panel-learning {
   flex: none;
+}
+
+/* Room for two lines of actions and two of text, so the panel is the same height whatever it shows. */
+.panel-learning .panel-body {
+  min-height: 117px;
 }
 
 .action {
@@ -1368,6 +1526,35 @@ body[data-layout='lab'] .pager {
 
 .chip-surprise {
   box-shadow: inset 3px 0 0 var(--alarm);
+}
+
+/* What this agent writes down and how it answers. Two lines, the same place on every page. */
+.kb-what {
+  display: grid;
+  flex: none;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 2px 0;
+  margin: 0;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bench) 45%, var(--panel));
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.kb-what dt {
+  color: var(--ink-3);
+  font: 600 11px/1.7 var(--sans);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.kb-what dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* The line above the table: the situation the marks are for. One line, fixed height. */
@@ -1550,6 +1737,45 @@ body[data-layout='lab'] .pager {
   padding-right: 10px;
 }
 
+/* A hierarchy of rows: exceptions indented under the row they are exceptions to. */
+.hierarchy tbody + tbody tr:first-child td {
+  border-top: 1px solid var(--ink-3);
+}
+
+/* Fixed columns, so the table always fits its panel. Chips wrap inside a cell when it is narrow. */
+.hierarchy {
+  table-layout: fixed;
+}
+
+.hierarchy th:nth-child(2) {
+  width: 34%;
+}
+
+.hierarchy th:nth-child(3) {
+  width: 78px;
+}
+
+
+.hi-except {
+  margin-right: 8px;
+  color: var(--ink-3);
+  font: 12.5px var(--sans);
+}
+
+/* Rows can be clicked to show the cells they speak for. */
+.hierarchy tbody tr {
+  cursor: pointer;
+}
+
+.hierarchy tr.is-picked td {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* A row that does not hold on every move it speaks for. */
+.hierarchy tr.is-broken .kb-count {
+  color: var(--alarm);
+}
+
 /* Confidence. */
 .trusts {
   display: flex;
@@ -1651,12 +1877,30 @@ body[data-layout='lab'] .pager {
   }
 
   .lab-head {
+    display: flex;
     flex-wrap: wrap;
     gap: 8px 20px;
+    height: auto;
+    padding: 10px 14px;
+  }
+
+  .setup {
+    flex-wrap: wrap;
   }
 
   .setup {
     margin-left: 0;
+  }
+
+  .demo {
+    height: auto;
+    margin: 22px -16px 8px;
+    padding: 12px;
+  }
+
+  .demo-solo {
+    margin: 22px 0 8px;
+    padding: 0;
   }
 
   .lab {
@@ -1681,4 +1925,51 @@ body[data-layout='lab'] .pager {
     min-height: 100dvh;
     overflow: visible;
   }
+}
+
+/* The curtain figures on the Identity Continuity page: coloured things and curtains. */
+.f-red,
+.f-blue,
+.f-gold,
+.f-green,
+.f-grey {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.f-red {
+  fill: var(--alarm);
+}
+
+.f-blue {
+  fill: var(--accent);
+}
+
+.f-gold {
+  fill: var(--block);
+}
+
+.f-green {
+  fill: var(--goal);
+}
+
+.f-grey {
+  fill: var(--ink-3);
+}
+
+.f-curtain-blue {
+  fill: color-mix(in srgb, var(--accent) 24%, var(--paper));
+  stroke: var(--accent);
+  stroke-width: 1.25;
+}
+
+.f-fold-blue {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke-width: 1;
+}
+
+.f-stripe {
+  fill: color-mix(in srgb, var(--ink) 55%, var(--paper));
 }

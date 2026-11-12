@@ -64,7 +64,7 @@ it up to any point. The site's step-back and timeline rely on this.
 | `controller.ts` | Holds the run and the position in it. No drawing. |
 | `lab.ts` | Arranges the regions and passes each what to show |
 | `world-views/` | One drawing per kind of world. A board game adds its own here. |
-| `panels/` | One file per region: state, timeline, knowledge (the stored table), combinations (the same store grouped, for an agent that writes every combination), learning |
+| `panels/` | One file per region: state, timeline, knowledge (the stored table), combinations (the same store grouped, for an agent that writes every combination), hierarchy (rows with their exceptions under them), learning |
 | `words.ts` | Every piece of text made from engine data |
 | `icons.ts` | Every icon the lab uses (Lucide), named in one place |
 
@@ -76,6 +76,18 @@ it up to any point. The site's step-back and timeline rely on this.
   number beats a sentence.
 - Every region is a titled panel with a fixed place. No popups, no tabs.
 - All controls are in one bar under the world. Set-up (world, seed) is in the page header.
+- Every page is a written page that scrolls and makes one point. A lab goes between its
+  paragraphs only where the point needs to be seen, and shows only what that point needs:
+  the world and its controls, and at most one view of what the agent holds. The words that
+  explain it are in the text, not in labels on the lab.
+- A lab inside a page is a fixed size. Its keys work only after it has been clicked.
+- What the agent holds and the world point at each other: clicking a row marks the cells it
+  speaks for, and clicking a cell marks the rows that speak there.
+- Labs are set up by name in `pages/index.ts`. Page numbers come from the order of the list
+  there and are written nowhere else, so pages are referred to by name.
+- The full-screen lab (`layout: 'lab'`, with seed, speed, the confidence panel and the two
+  lines saying what an agent stores and how it answers) still exists in `lab.ts`. No page
+  uses it now.
 - Colour is used only for three marks: curiosity, goal and surprise.
 - Nothing moves when a highlight or a selection changes. Highlights change colour only, never
   size, weight or spacing, and a panel keeps its height whatever it shows.

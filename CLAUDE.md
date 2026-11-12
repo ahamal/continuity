@@ -10,7 +10,8 @@ for adding a stage. Follow both.
 - The viewer is a thinking tool. Keep the points under "What the viewer must keep true" in
   `ARCHITECTURE.md`.
 - The theory is the user's. Describe it in their terms: identity, continuity, hierarchy,
-  curiosity, surprise.
+  curiosity. Surprise is not a separate idea: a wrong prediction adds a more specific
+  continuity, and the hierarchy does the rest.
 
 Commands: `npm run dev`, `npm test`, `npm run typecheck`, `npm run bench`,
 `npm run demo -- 2d-walls --seed 3`.

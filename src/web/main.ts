@@ -88,7 +88,7 @@ function show(): void {
   if (cleanup) cleanup();
   const page = currentPage();
   document.body.dataset.layout = page.layout ?? 'prose';
-  cleanup = page.mount(pageEl);
+  cleanup = page.mount(pageEl, stageNumber(page));
   renderNav(page);
   renderPager(page);
   document.title = `${page.label} · Continuity`;

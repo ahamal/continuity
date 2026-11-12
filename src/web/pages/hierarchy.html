@@ -1,0 +1,100 @@
+<div class="story" style="--stage: '0'">
+  <article class="prose">
+    <h1>The third agent</h1>
+    <p>
+      This is the third build. It writes the same rows as the second agent, and answers with
+      the most specific row that applies.
+    </p>
+
+    <h2>How it works</h2>
+    <ul>
+      <li>
+        <strong>Writes.</strong> The same rows as the second agent: one for every combination
+        of the facts in a move. The one difference is the count. Each different move is counted
+        once, so repeating the same bump does not make a row look stronger.
+      </li>
+      <li>
+        <strong>Answers.</strong> With the most specific row that applies. At the left edge
+        both "left" and "left, x = 0" apply. The second has more facts, so it answers. When two
+        rows are equally specific and disagree, the one with the better record answers. A
+        row's record is the times it held, divided by the times it was seen plus one, so a row
+        seen once counts as a guess.
+      </li>
+      <li>
+        <strong>Explores.</strong> It goes to the move it is least sure about and tries it. It
+        also plans through rows it has seen fewer than five times, so that a guess gets tested.
+      </li>
+    </ul>
+
+    <h2>Try it</h2>
+    <p>
+      Press Explore. The knowledge base on the right shows each general row, with the more
+      specific rows indented under it. Click a row to see the cells it answers for. Click a
+      cell to see which rows answer there.
+    </p>
+  </article>
+
+  <div class="demo" data-demo="hierarchy"></div>
+
+  <article class="prose">
+    <h2>Results</h2>
+    <p>We ran the agent 500 times in each world, the same way as the first two.</p>
+    <table class="facts-table">
+      <thead>
+        <tr><th>World</th><th>First agent</th><th>Second agent</th><th>Third agent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1D line</td><td>500 of 500</td><td>500 of 500</td><td>500 of 500</td></tr>
+        <tr><td>2D grid</td><td>500 of 500</td><td>131 of 500</td><td>500 of 500</td></tr>
+        <tr><td>2D grid with a wall</td><td>367 of 500</td><td>59 of 500</td><td>500 of 500</td></tr>
+      </tbody>
+    </table>
+    <p>
+      It reaches the goal every time, in all three worlds. Shown every move of the world with a
+      wall, it also answers all 384 correctly, and 18 rows do all of that answering: one for
+      each of the four moves, and 14 more specific ones beneath them for the edges and the
+      sides of the wall. The first agent needed 388.
+    </p>
+    <blockquote class="quote">
+      <p>Entities should not be multiplied beyond necessity.</p>
+      <footer>Occam's razor</footer>
+    </blockquote>
+    <p>
+      Nobody told the agent that the move is the fact that matters most. The rows about a move
+      ended up on top because they need the fewest specific rows beneath them:
+    </p>
+    <table class="facts-table">
+      <thead>
+        <tr><th>Row</th><th>Moves it answers for itself</th><th>Specific rows beneath it</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Up, down</td><td>85 of 85</td><td>2 each: an edge, and one side of the wall</td></tr>
+        <tr><td>Left, right</td><td>82 of 82</td><td>5 each: an edge, and four sides of the wall</td></tr>
+        <tr><td><code>x = 0</code>, and every other row about a place</td><td>12 of 12 or fewer</td><td>19 or more each</td></tr>
+      </tbody>
+    </table>
+
+    <h2>What is missing</h2>
+    <p>
+      The agent found the wall, but only as separate cases. "Something is in the way" cannot be
+      said with x and y, so the wall is ten unrelated rows. Nothing learned at one side of it
+      helps at the next side, or at another wall.
+    </p>
+    <p>
+      Writing every combination also does not scale. Each fact added to the state multiplies
+      the rows for one move by four: 127 with x and y, and 32,767 if we add what is to the
+      left, right, above and below.
+    </p>
+    <p>
+      And we still hand it a few things: the facts themselves (that a place is an x and a y),
+      that the question to ask is what will change, the "plus one" in a row's record, and how
+      long it explores, which is 100 steps.
+    </p>
+
+    <h2>Next</h2>
+    <p>
+      The next page puts together what the three agents showed. The question it ends on is where
+      the facts come from.
+    </p>
+  </article>
+</div>

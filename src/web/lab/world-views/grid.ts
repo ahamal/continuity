@@ -56,6 +56,7 @@ export function createGridView(
     return g;
   };
   const visited = layer('visited');
+  const spoken = layer('spoken');
   const cells = layer('cells');
   const axis = layer('axis');
   const trail = layer('trail');
@@ -118,6 +119,13 @@ export function createGridView(
       if (!summary.visits.has(stateKey(state))) continue;
       const { x, y } = grid.cellOf(state);
       visited.append(s('rect', { class: 'visited', x: cellX(x), y: cellY(y), width: CELL, height: CELL }));
+    }
+
+    // The cells a chosen row speaks for.
+    spoken.replaceChildren();
+    for (const state of scene.spoken) {
+      const { x, y } = grid.cellOf(state);
+      spoken.append(s('rect', { class: 'spoken', x: cellX(x) + 3, y: cellY(y) + 3, width: CELL - 6, height: CELL - 6 }));
     }
 
     // Every move so far, coloured by what was driving the agent.

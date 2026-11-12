@@ -3,7 +3,7 @@ import type { State, StatePart } from '../../core/state';
 import type { Representation } from '../parts';
 
 /**
- * Stages 3 and 4. A state is its raw coordinates, one fact per coordinate. A
+ * A state is its raw coordinates, one fact per coordinate. A
  * change is the difference in each coordinate, and distance is the sum of
  * those differences.
  */

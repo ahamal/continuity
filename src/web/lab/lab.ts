@@ -6,6 +6,7 @@
 
 import type { Recipe } from '../../agents/recipes';
 import { type State, formatState, sameState } from '../../core/state';
+import type { Run } from '../../runs/run';
 import { summarise } from '../../runs/summary';
 import { type Scenario, findScenario } from '../../worlds/scenarios';
 import { Controller } from './controller';
@@ -13,8 +14,10 @@ import { cx, h, put } from './dom';
 import { icon, icons } from './icons';
 import { lookupsAt } from '../../agents/inspect';
 import { renderCombinations } from './panels/combinations';
+import { type Row, renderHierarchy } from './panels/hierarchy';
 import { type Sort, renderAsking, renderKnowledge } from './panels/knowledge';
 import { renderLearning } from './panels/learning';
+import { renderReasons } from './panels/reasons';
 import { renderActivity, renderLastMove } from './panels/state';
 import { createTimeline } from './panels/timeline';
 import { type WorldView, createWorldView } from './world-views';
@@ -24,16 +27,36 @@ export interface LabOptions {
   scenarioIds: string[];
   /** Where the world picker, seed and "Start over" go. Usually the page header. */
   setupSlot?: HTMLElement | null;
+  /** For `knowledge: 'hierarchy'`: reads the agent's hierarchy and how many moves it rests on. */
+  hierarchy?: (agent: Run['agent']) => { rows: Row[]; moves: number };
+  /** What the agent writes down on each move, in one sentence. Shown above the knowledge base. */
+  stores?: string;
+  /** How it answers a question from that, in one sentence. */
+  answers?: string;
   /**
    * How the knowledge base is laid out. `rows`: one table of every row, for an
    * agent that stores few. `combinations`: rows grouped by which items they
-   * have, for an agent that stores every combination.
+   * have, for an agent that stores every combination. `hierarchy`: the rows
+   * an agent has built for each action, with their exceptions under them.
+   * `reasons`: for one cell, what it expects of each action and the row that
+   * says so.
    */
-  knowledge?: 'rows' | 'combinations';
+  knowledge?: 'rows' | 'combinations' | 'hierarchy' | 'reasons' | 'none';
+  /**
+   * True for a lab placed inside a written page. It is smaller and shows less:
+   * the world with its controls, and what the agent holds beside it. No seed,
+   * no speed, no confidence panel. Its keys work only after it is clicked, so
+   * they do not take over scrolling the page.
+   */
+  compact?: boolean;
+  /** Heading over what the agent holds, in a compact lab. */
+  holdsTitle?: string;
   /** Which "this move does nothing" beliefs the world shows. See `Scene.stays`. */
   stays?: 'seen' | 'expected';
   /** Which row's count decides trust, in words. It depends on the agent. */
   trustedRow?: string;
+  /** Replaces the sentence about trust, for an agent whose confidence is not a fixed count. */
+  confidenceNote?: string;
 }
 
 const SPEEDS: [label: string, perSecond: number][] = [
@@ -53,6 +76,9 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   const grouped = options.knowledge === 'combinations';
   /** The combination whose rows are shown, when the knowledge base is grouped. */
   let picked: string | null = null;
+  /** The row of a hierarchy that was clicked: the world shows the cells it speaks for. */
+  let pickedRow: string | null = null;
+  const compact = options.compact === true;
 
   // State side.
   const activityEl = h('span', { class: 'pill', 'aria-live': 'polite' });
@@ -75,6 +101,15 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   // Set-up: chosen before a run, so it sits apart from both sides.
   const setupEl = options.setupSlot ?? h('div', { class: 'setup' });
 
+  // The same two lines on every page: what this agent writes down, and how it
+  // answers from it. They are what differs between the pages.
+  const whatEl = h('dl', { class: 'kb-what' },
+    h('dt', null, 'Stores'), h('dd', { title: options.stores }, options.stores),
+    h('dt', null, 'Answers'), h('dd', { title: options.answers }, options.answers));
+  const knowledgeBody = grouped
+    ? [h('div', { class: 'split' }, combosEl, h('div', { class: 'split-main' }, askingEl, combosRowsEl))]
+    : [askingEl, knowledgeEl];
+
   /** A titled box. Every region of the lab is one of these. */
   const panel = (name: string, symbol: Parameters<typeof icon>[0], title: string, aside: HTMLElement | null, ...body: HTMLElement[]) =>
     h('section', { class: `panel panel-${name}` },
@@ -89,7 +124,25 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   };
   const timeline = createTimeline(timelineEl, seek);
 
-  container.replaceChildren(
+  if (compact) {
+    // Inside a written page: the world and its controls, and what the agent holds beside it.
+    container.replaceChildren(
+      h('div', { class: cx('lab', 'lab-compact', options.knowledge === 'none' && 'lab-solo') },
+        h('div', { class: 'col' },
+          h('section', { class: 'panel panel-state' },
+            h('div', { class: 'compact-top' }, setupEl, activityEl),
+            worldEl,
+            lastMoveEl),
+          h('section', { class: 'panel panel-controls' }, controlsEl, h('div', { class: 'time-row' }, timelineEl)),
+        ),
+        options.knowledge !== 'none' &&
+          h('div', { class: 'col' },
+            h('section', { class: 'panel panel-entries' },
+              h('header', { class: 'panel-head' }, h('h2', null, options.holdsTitle ?? 'Knowledge base'), kbAsideEl),
+              ...knowledgeBody)),
+      ),
+    );
+  } else container.replaceChildren(
     h('div', { class: cx('lab', grouped && 'lab-grouped') },
       !options.setupSlot && setupEl,
       h('div', { class: 'col' },
@@ -105,10 +158,7 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
         h('section', { class: 'panel panel-controls' }, controlsEl, h('div', { class: 'time-row' }, timelineEl, speedEl)),
       ),
       h('div', { class: 'col' },
-        grouped
-          ? panel('entries', icons.entries, 'Knowledge base', kbAsideEl,
-              h('div', { class: 'split' }, combosEl, h('div', { class: 'split-main' }, askingEl, combosRowsEl)))
-          : panel('entries', icons.entries, 'Knowledge base', kbAsideEl, askingEl, knowledgeEl),
+        panel('entries', icons.entries, 'Knowledge base', kbAsideEl, whatEl, ...knowledgeBody),
         panel('learning', icons.knowledge, 'Confidence', h('span', { class: 'panel-note' }, 'derived'), learningEl),
       ),
     ),
@@ -121,6 +171,7 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
 
   function newRun(scenario = controller.scenario, seed = controller.seed): void {
     selected = null;
+    pickedRow = null;
     controller.reset(scenario, seed);
     view = createWorldView(controller.view.world, select);
     worldEl.replaceChildren(view.el);
@@ -138,7 +189,7 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
               onClick: () => newRun(scenario),
             }, scenario.label)),
         ),
-      h('label', { class: 'field', title: 'The seed fixes the random choices, so a run can be repeated exactly.' },
+      !compact && h('label', { class: 'field', title: 'The seed fixes the random choices, so a run can be repeated exactly.' },
         icon(icons.seed, 15), 'Seed',
         h('input', {
           class: 'seed', type: 'number', min: 1, value: controller.seed,
@@ -220,7 +271,7 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
 
     put(kbAsideEl,
       h('span', { class: 'panel-note' }, `${run.agent.kb.size} rows`),
-      h('div', { class: 'segmented segmented-small', 'aria-label': 'Order' },
+      !compact && h('div', { class: 'segmented segmented-small', 'aria-label': 'Order' },
         ...([['written', 'Newest first'], ['facts', 'Fewest facts first']] as [Sort, string][]).map(([id, label]) =>
           h('button', {
             class: cx(sort === id && 'is-on'),
@@ -255,13 +306,36 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
     renderSetup();
 
     renderActivity(activityEl, summary, position);
-    view.update({ run, summary, selected, stays: options.stays ?? 'seen' });
+    // The cells the clicked row speaks for: where it gives the agent's expectation for its action.
+    const spoken = pickedRow === null
+      ? []
+      : view.states().filter((state) =>
+          run.agent.actions.some((action) => run.agent.predict(state, action)?.basis.includes(pickedRow!)));
+    view.update({ run, summary, selected, stays: options.stays ?? 'seen', spoken });
     renderLastMove(lastMoveEl, summary);
     renderControls(run.agent.isConfident(), position);
     timeline.update({ events: controller.head.events, cursor: controller.cursor, stops });
 
     const onShowMove = (move: number) => seek(afterMove(move));
-    if (grouped) {
+    if (options.knowledge === 'reasons') {
+      put(kbAsideEl);
+      renderReasons(askingEl, knowledgeEl, { agent: run.agent, state: selected ?? position });
+    } else if (options.knowledge === 'hierarchy') {
+      renderHierarchy(kbAsideEl, askingEl, knowledgeEl, {
+        ...options.hierarchy!(run.agent),
+        // The rows that speak for the selected cell, or else the row that spoke for the last move.
+        answered: new Set(
+          selected
+            ? run.agent.actions.flatMap((action) => run.agent.predict(selected!, action)?.basis ?? [])
+            : (summary.lastStep?.expected?.basis ?? []),
+        ),
+        picked: pickedRow,
+        onPick: (id) => {
+          pickedRow = pickedRow === id ? null : id;
+          render();
+        },
+      });
+    } else if (grouped) {
       put(kbAsideEl, h('span', { class: 'panel-note' }, `${run.agent.kb.size} rows`));
       renderCombinations(combosEl, askingEl, combosRowsEl, {
         agent: run.agent,
@@ -284,10 +358,19 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
       summary,
       possibleMoves: view.states().length * run.agent.actions.length,
       trustedRow: options.trustedRow ?? "the action's one-fact row",
+      note: options.confidenceNote,
     });
   }
 
+  // Inside a written page, the lab is in use from a click inside it until a click outside it.
+  let inUse = !compact;
+  function onPointer(event: PointerEvent): void {
+    if (compact) inUse = container.contains(event.target as Node);
+  }
+  document.addEventListener('pointerdown', onPointer);
+
   function onKey(event: KeyboardEvent): void {
+    if (!inUse) return;
     const target = event.target as HTMLElement | null;
     if (target && /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(target.tagName)) return;
     if (event.key === 'ArrowRight') {
@@ -312,5 +395,6 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   return () => {
     controller.dispose();
     document.removeEventListener('keydown', onKey);
+    document.removeEventListener('pointerdown', onPointer);
   };
 }

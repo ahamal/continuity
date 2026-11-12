@@ -1,0 +1,82 @@
+<div class="story" style="--stage: '0'">
+  <article class="prose">
+    <h1>The second agent</h1>
+    <p>
+      This is the second build. It writes a row for every combination of the facts in a move,
+      so the rows in between exist. To answer, it lets every row that applies have a say.
+    </p>
+
+    <h2>How it works</h2>
+    <ul>
+      <li>
+        <strong>Writes.</strong> A move on the grid is seven facts seen together: the move, x
+        and y before, x and y after, and the change in each. The agent writes a row for every
+        combination of them, 127 for each move, and counts how often it has seen those facts
+        together. After one bump into the right edge, "going right at x = 9 changes nothing"
+        exists as a row, along with 126 others.
+      </li>
+      <li>
+        <strong>Answers.</strong> Every row that applies has a say on what will change, and
+        the row that has been right the largest share of the time wins. A tie goes to the row
+        with more facts.
+      </li>
+      <li>
+        <strong>Explores.</strong> It makes the move it is most curious about. It stays
+        curious about a move until a row that agrees with its answer has held five times.
+      </li>
+    </ul>
+
+    <h2>Try it</h2>
+    <p>
+      Press Explore. Each bar on the grid is a move it now expects to do nothing, and almost
+      all of them are wrong. Click a cell with a bar, and the knowledge base on the right shows
+      the rows behind it.
+    </p>
+  </article>
+
+  <div class="demo" data-demo="voting"></div>
+
+  <article class="prose">
+    <h2>Results</h2>
+    <p>We ran the agent 500 times in each world, the same way as the first one.</p>
+    <table class="facts-table">
+      <thead>
+        <tr><th>World</th><th>First agent</th><th>Second agent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1D line</td><td>500 of 500</td><td>500 of 500</td></tr>
+        <tr><td>2D grid</td><td>500 of 500</td><td>131 of 500</td></tr>
+        <tr><td>2D grid with a wall</td><td>367 of 500</td><td>59 of 500</td></tr>
+      </tbody>
+    </table>
+    <p>
+      It does worse than the first agent. The rows it needs are all there now, including the
+      ones in between. Choosing between them by vote is what goes wrong.
+    </p>
+
+    <h2>What is missing</h2>
+    <p>
+      A vote treats rows that were seen together as if one followed from the other. Having only
+      gone up from a cell, the agent holds "at this cell, x does not change", and then expects
+      that of every move from that cell.
+    </p>
+    <p>
+      A vote also makes rivals of rows that belong together. "Going left takes one from x" is
+      right nearly everywhere, and "going left at x = 0 changes nothing" is a specific case
+      beneath it. In a vote they compete on their share, and a row seen once beats a row that
+      has held twenty times out of twenty-one.
+    </p>
+    <p>
+      And the agent never finds out. It does not plan through a move it expects to do nothing,
+      so a wrong row of that kind is never tested.
+    </p>
+
+    <h2>Next</h2>
+    <p>
+      The third agent keeps the same rows and changes how it answers. The most specific row
+      that applies answers, so a general row and a specific row beneath it no longer compete.
+      It also goes looking for the moves it is least sure about, so that its guesses get
+      tested.
+    </p>
+  </article>
+</div>

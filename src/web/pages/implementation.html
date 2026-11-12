@@ -1,83 +1,163 @@
-<article class="prose" style="--stage: '2'">
-  <p class="kicker">Stage 02</p>
-  <h1>Implementation</h1>
+<article class="prose" style="--stage: '0'">
+  <h1>Building the engine</h1>
 
-  <p class="lead">
-    The agent is a store of what was seen to follow what, plus four operations on it: observe,
-    predict, be curious, and plan. This page describes the version used in stages 3 to 5.
-  </p>
-
-  <h2>Facts</h2>
   <p>
-    Everything the agent knows is written as named values, called facts. A situation is a set of
-    facts, such as <code>action = right, x = 4, y = 4</code>.
+    The first page said how we think the mind makes sense of the world. Here we go through the
+    same steps again, and for each one we work out what it has to become before an engine can
+    do it.
   </p>
-
-  <h2>The knowledge base</h2>
   <p>
-    The knowledge base is a flat store. Each entry has a set of input facts and the outcomes that
-    were seen to follow them, each with a count. Nothing is nested.
+    We need a world to try it in, and we start with the simplest one we can: a grid. There is
+    one thing on it, and it can be moved up, down, left or right. The engine is told nothing
+    about what the moves do.
   </p>
-  <table class="facts-table">
-    <thead>
-      <tr><th>Inputs</th><th>Outcome</th><th>Seen</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><code>action = right</code></td><td><code>dx = +1, dy = 0</code></td><td>7</td></tr>
-      <tr><td><code>action = right</code></td><td><code>dx = 0, dy = 0</code></td><td>1</td></tr>
-      <tr><td><code>action = right, x = 4, y = 4</code></td><td><code>new_state = (5, 4)</code></td><td>1</td></tr>
-    </tbody>
-  </table>
   <p>
-    An entry with fewer inputs applies more widely. That is the hierarchy: it is not a separate
-    structure, only the relation between entries with fewer and more inputs.
-  </p>
-
-  <h2>Observing</h2>
-  <p>
-    One observation is a state, an action and the state that followed. The agent stores it at two
-    levels of generality.
-  </p>
-  <ul>
-    <li><strong>General:</strong> the action alone, followed by the change it caused.</li>
-    <li><strong>Specific:</strong> the whole state and the action, followed by the new state and by the change.</li>
-  </ul>
-  <p>
-    Observing is the same whether the agent made the move or watched it happen. This is what lets
-    one agent learn by watching and by acting.
-  </p>
-
-  <h2>Querying</h2>
-  <p>
-    A query asks for one fact, given what is known. An entry applies when all of its inputs are
-    among the known facts. Of the entries that apply, the one with the most inputs wins, and a
-    tie goes to the outcome seen most often.
+    A move on the grid works like a curtain. The thing goes in at one place, we pick a move,
+    and it comes out at another. The engine sees where it was and where it ended up, and
+    nothing in between.
   </p>
 
   <figure class="fig">
-    <svg viewBox="0 0 640 196" role="img" aria-label="A query with three known facts checked against three stored entries. The entry with one input applies, the entry with three inputs applies and answers, and an entry for a different action does not apply.">
+    <svg viewBox="0 0 640 134" role="img" aria-label="On the left, a red ball goes behind the blue curtain and a blue ball comes out. On the right, the thing at x = 4, y = 4 goes through the move right and comes out at x = 5, y = 4.">
       <defs>
-        <marker id="f21-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+        <marker id="f21m-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="f-solid" d="M0,0.5 L8,4 L0,7.5 Z" />
+        </marker>
+      </defs>
+      <text class="f-th" x="160" y="18" text-anchor="middle">THE BLUE CURTAIN</text>
+      <rect class="f-curtain-blue" x="137" y="32" width="46" height="68" />
+      <path class="f-fold-blue" d="M144.7,32 V100 M152.3,32 V100 M160.0,32 V100 M167.7,32 V100 M175.3,32 V100" />
+      <path class="f-ink" d="M131,32 H189" />
+      <circle class="f-red" cx="84" cy="66" r="10" />
+      <path class="f-thin" marker-end="url(#f21m-arrow)" d="M98,66 H131" />
+      <path class="f-thin" marker-end="url(#f21m-arrow)" d="M189,66 H222" />
+      <circle class="f-blue" cx="236" cy="66" r="10" />
+      <text class="f-tm" x="84" y="124" text-anchor="middle">a red ball</text>
+      <text class="f-tm" x="236" y="124" text-anchor="middle">a blue ball</text>
+      <text class="f-th" x="480" y="18" text-anchor="middle">THE MOVE "RIGHT"</text>
+      <rect class="f-shade" x="457" y="32" width="46" height="68" />
+      <path class="f-rule" d="M466,32 V100 M475,32 V100 M484,32 V100 M493,32 V100" />
+      <rect class="f-thin" x="457" y="32" width="46" height="68" />
+      <path class="f-ink" d="M451,32 H509" />
+      <path class="f-solid" d="M404,57 L413,66 L404,75 L395,66 Z" />
+      <path class="f-thin" marker-end="url(#f21m-arrow)" d="M418,66 H451" />
+      <path class="f-thin" marker-end="url(#f21m-arrow)" d="M509,66 H542" />
+      <path class="f-solid" d="M556,57 L565,66 L556,75 L547,66 Z" />
+      <text class="f-tm" x="404" y="124" text-anchor="middle">x = 4, y = 4</text>
+      <text class="f-tm" x="556" y="124" text-anchor="middle">x = 5, y = 4</text>
+    </svg>
+    <figcaption><b>Fig 2.1</b>A move works like a curtain. The engine sees what went in and what came out.</figcaption>
+  </figure>
+
+  <p>The rest of the page takes the ideas in the same order as before. This is where each one ends up:</p>
+  <table class="facts-table">
+    <thead>
+      <tr><th>Idea</th><th>With the curtains</th><th>In the engine</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Identity</td><td>The ball</td><td>The one thing on the grid, described by facts</td></tr>
+      <tr><td>Continuity</td><td>"The blue curtain turns it blue"</td><td>"Going right adds one to x", kept as a row</td></tr>
+      <tr><td>Hierarchy of assumptions</td><td>Any object, any ball, a red ball</td><td>A row with fewer facts covers more</td></tr>
+      <tr><td>Curiosity</td><td>A missing assumption</td><td>A number worked out from the rows</td></tr>
+      <tr><td>Reasoning</td><td>Curtains put in order</td><td>Predictions chained into a plan</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Identity</h2>
+  <p>
+    On the first page we were the ones who identified the ball. For now we do the same for the
+    engine: we hand it one thing, and we tell it how that thing is described. Identifying
+    things on its own comes later.
+  </p>
+  <p>
+    The description is a set of <strong>facts</strong>. A fact is a name with a value, such as
+    <code>x = 4</code> or <code>y = 4</code>. The move being made is a fact too:
+    <code>action = right</code>. So at any moment the engine knows a handful of facts: where
+    the thing is, and which move is being made.
+  </p>
+  <p>
+    That is all it starts with. It is not told what any move does, where the grid ends, or
+    where the walls are.
+  </p>
+
+  <h2>Continuity</h2>
+  <p>
+    The engine sees one move. The thing is at <code>x = 4, y = 4</code>, the move is
+    <code>right</code>, and afterwards it is at <code>x = 5, y = 4</code>. As with the curtain,
+    it takes this to be the same thing, and it forms an idea of what happened to it: x went up
+    by one.
+  </p>
+  <p>
+    It keeps that idea as a <strong>row</strong>. A row says which facts were known, what
+    followed, and how many times that has been seen:
+  </p>
+  <table class="facts-table">
+    <thead>
+      <tr><th>Known</th><th>What followed</th><th>Seen</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>action = right</code></td><td><code>dx = +1, dy = 0</code></td><td>1</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Here <code>dx</code> and <code>dy</code> are how much x and y changed. This row is a
+    continuity. It is what "the blue curtain turns it blue" looks like inside the engine. Each
+    time the same thing follows again the count goes up, and the count is the strength of the
+    assumption.
+  </p>
+  <p>
+    The row is the same whether the engine made the move itself or watched it being made. That
+    is what will later let it learn a game by watching.
+  </p>
+
+  <h2>Hierarchy of assumptions</h2>
+  <p>
+    With the curtain, one look gave us assumptions at several levels: any object, any ball, a
+    red ball. The engine gets its levels from how many facts a row keeps. From that same move
+    it can write two rows:
+  </p>
+  <table class="facts-table">
+    <thead>
+      <tr><th></th><th>Known</th><th>What followed</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>General</td><td><code>action = right</code></td><td><code>dx = +1, dy = 0</code></td></tr>
+      <tr><td>Specific</td><td><code>action = right, x = 4, y = 4</code></td><td><code>dx = +1, dy = 0</code></td></tr>
+    </tbody>
+  </table>
+  <p>
+    A row with fewer facts covers more. The general row answers for every place on the grid,
+    including places the thing has never been. The specific row answers for one place only.
+  </p>
+  <p>
+    To answer a question, the engine takes every row whose facts are all true at that moment,
+    and follows the one with the most facts.
+  </p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 196" role="img" aria-label="A query with three known facts checked against three stored rows. The row with one fact applies, the row with three facts applies and answers, and a row for a different move does not apply.">
+      <defs>
+        <marker id="f22-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
           <path class="f-solid" d="M0,0.5 L8,4 L0,7.5 Z" />
         </marker>
       </defs>
 
       <text class="f-th" x="16" y="20">KNOWN</text>
-      <text class="f-th" x="192" y="20">ENTRY INPUTS</text>
-      <text class="f-th" x="430" y="20">FOLLOWED BY</text>
+      <text class="f-th" x="192" y="20">ROW: KNOWN FACTS</text>
+      <text class="f-th" x="430" y="20">WHAT FOLLOWED</text>
       <path class="f-ink" d="M16,28 H624" />
 
       <text class="f-t" x="16" y="52">action = right</text>
       <text class="f-t" x="16" y="68">x = 4</text>
       <text class="f-t" x="16" y="84">y = 4</text>
       <path class="f-thin" d="M118,42 H126 V90 H118 M126,66 H150 M150,54 V118" />
-      <path class="f-thin" marker-end="url(#f21-arrow)" d="M150,54 H180" />
-      <path class="f-thin" marker-end="url(#f21-arrow)" d="M150,118 H176" />
+      <path class="f-thin" marker-end="url(#f22-arrow)" d="M150,54 H180" />
+      <path class="f-thin" marker-end="url(#f22-arrow)" d="M150,118 H176" />
       <path class="f-muted f-dash" d="M150,118 V170 H180" />
 
       <text class="f-t" x="192" y="57">action = right</text>
-      <text class="f-tm" x="192" y="72">1 input, applies</text>
-      <path class="f-muted" marker-end="url(#f21-arrow)" d="M300,54 H420" />
+      <text class="f-tm" x="192" y="72">1 fact, applies</text>
+      <path class="f-muted" marker-end="url(#f22-arrow)" d="M300,54 H420" />
       <text class="f-t" x="430" y="51">dx = +1, dy = 0  ×7</text>
       <text class="f-tm" x="430" y="66">dx = 0, dy = 0   ×1</text>
 
@@ -85,72 +165,73 @@
 
       <rect class="f-accent-fill" x="182" y="104" width="3" height="36" />
       <text class="f-t" x="192" y="121">action = right, x = 4, y = 4</text>
-      <text class="f-ta" x="192" y="136">3 inputs: most specific, so it answers</text>
-      <path class="f-accent" marker-end="url(#f21-arrow)" d="M368,118 H420" />
-      <text class="f-t" x="430" y="121">new_state = (5, 4)  ×1</text>
+      <text class="f-ta" x="192" y="136">3 facts: most specific, so it answers</text>
+      <path class="f-accent" marker-end="url(#f22-arrow)" d="M368,118 H420" />
+      <text class="f-t" x="430" y="121">dx = +1, dy = 0  ×1</text>
 
       <path class="f-rule" d="M184,150 H624" />
 
       <text class="f-tm" x="192" y="173">action = up</text>
       <path class="f-muted" d="M190,170 H260" />
-      <text class="f-tm" x="192" y="188">does not apply: the action differs</text>
+      <text class="f-tm" x="192" y="188">does not apply: the move differs</text>
       <text class="f-tm" x="430" y="173">dx = 0, dy = +1  ×5</text>
     </svg>
-    <figcaption><b>Fig 2.1</b>Answering "what is the new state?" for one situation. Two entries apply. The one with more inputs wins.</figcaption>
+    <figcaption><b>Fig 2.2</b>Working out where the thing will end up. Two rows apply, and the one with more facts answers.</figcaption>
   </figure>
 
-  <h2>Predicting</h2>
-  <ol>
-    <li>If this exact state and action has been seen, predict the state that followed. One sighting is enough.</li>
-    <li>Otherwise take the change the action most often causes and apply it to the current state.</li>
-  </ol>
   <p>
-    The second step is why the agent can predict what happens in places it has never been.
+    The gold ball has its match here. Suppose there is a wall, and the engine tries going right
+    beside it. Nothing changes. It keeps "going right adds one to x", because that is still
+    right almost everywhere. Beneath it, it writes what it just saw: going right from this
+    place changes nothing. The next time it is at that place, the more specific row answers.
   </p>
 
   <h2>Curiosity</h2>
+  <p>
+    Curiosity was a missing assumption. In the engine it becomes a number, worked out from the
+    rows, for each move it could make from where it is:
+  </p>
   <ul>
-    <li>Zero if this exact state and action has been seen.</li>
-    <li>Otherwise one divided by the number of times the action has been seen.</li>
-    <li>Zero once the action has been seen five times.</li>
+    <li><strong>1</strong> when it has no row for the move at all.</li>
+    <li><strong>One divided by the count</strong> once the move has been seen, so it falls each time.</li>
+    <li><strong>0</strong> once the move has been seen five times, or once it has a row for this exact place.</li>
   </ul>
   <p>
-    While exploring, the agent takes the action it is most curious about. When nothing nearby is
-    interesting it moves at random. It stops when every action has been seen five times.
+    While it explores, the engine makes the move it is most curious about. When nothing nearby
+    is interesting, it moves at random until something is. It stops exploring when it is no
+    longer curious about any move. The five is a number we chose.
   </p>
 
-  <h2>Planning</h2>
+  <h2>Reasoning</h2>
   <p>
-    To reach a goal the agent searches breadth-first through predicted states, calling predict on
-    the result of the previous prediction. If the search gives up, it falls back to stepping
-    toward the goal greedily.
+    With the curtains, we got a blue cube by putting assumptions in order. The engine does the
+    same to reach a place. We give it a goal, such as <code>x = 8, y = 2</code>. It asks its
+    rows where each move would take it from here, then where each move would take it from
+    there, and carries on until one of those chains ends at the goal. That chain of moves is
+    its plan.
   </p>
-
-  <h2>Surprise</h2>
   <p>
-    While following a plan, the agent compares each result with its prediction. When they differ,
-    the observation it stores becomes a specific entry that overrides the general rule there, and
-    the agent plans again from where it is.
+    Most of the places in a plan are ones it has never been to. It can still plan through them,
+    because the general rows answer for them.
   </p>
-
-  <h2>What the world provides</h2>
   <p>
-    The world provides the list of actions, the current state, and names for the parts of a
-    state. The agent brings a representation: how a state becomes facts, how the difference
-    between two states is measured, and how far apart two states are. In stages 3 to 5 that
-    representation is raw coordinates. This is the built-in part, and stage 6 is about how much
-    of it should stay built in.
+    Then it follows the plan, and checks each move against what it expected. When a move turns
+    out differently, it writes down what it saw, as with the wall above, and plans again from
+    where it is.
   </p>
 
-  <h2>Where it is in the code</h2>
-  <table class="facts-table">
-    <tbody>
-      <tr><td><code>src/core/</code></td><td>Facts and the knowledge base</td></tr>
-      <tr><td><code>src/agents/</code></td><td>The agent and its parts: storing, predicting, curiosity, planning</td></tr>
-      <tr><td><code>src/worlds/</code></td><td>The line, the grid and the ready-made scenarios</td></tr>
-      <tr><td><code>src/runs/</code></td><td>Connects an agent to a world and records what happens</td></tr>
-      <tr><td><code>src/experiments/</code></td><td>Command-line runs and the benchmark</td></tr>
-      <tr><td><code>src/web/</code></td><td>These pages</td></tr>
-    </tbody>
-  </table>
+  <h2>What we build first</h2>
+  <p>
+    The first version of the engine keeps the hierarchy as small as it can be: two levels. For
+    every move it sees, it writes the general row, with the move alone, and the specific row,
+    with the move at that exact place. It writes nothing in between.
+  </p>
+  <p>
+    For now we hand it three things: the facts that describe the thing, how to measure a change
+    between two moments, and how far apart two places are. Everything else it has to find.
+  </p>
+  <p>
+    That is enough to try the whole loop: explore out of curiosity, build rows, plan, and
+    correct itself. The next page runs it on a line, a grid, and a grid with a wall.
+  </p>
 </article>

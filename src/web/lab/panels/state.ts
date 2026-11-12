@@ -50,9 +50,11 @@ export function renderLastMove(el: HTMLElement, summary: Summary): void {
   const why =
     step.phase === 'goal'
       ? `plan step ${step.planStep!.index} of ${step.planStep!.of}`
-      : step.choice!.random
-        ? 'picked at random, nothing new here'
-        : `most curious about it (${step.choice!.curiosity.toFixed(2)})`;
+      : step.choice!.heading
+        ? `on the way to try something at ${formatState(step.choice!.heading)}`
+        : step.choice!.random
+          ? 'picked at random, nothing new here'
+          : `most curious about it (${step.choice!.curiosity.toFixed(2)})`;
 
   const stayed = sameState(step.from, step.to);
   const outcome = !step.expected
