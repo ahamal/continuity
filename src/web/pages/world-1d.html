@@ -3,7 +3,7 @@
   <h1>1D world</h1>
   <p class="lead">
     Twelve cells in a row. The agent can move left or right and knows nothing else. Press
-    Explore, then send it somewhere.
+    Start exploring, then send it somewhere.
   </p>
 </header>
 
@@ -12,7 +12,7 @@
 <template data-lab-notes>
   <ul>
     <li><strong>Exploring is short.</strong> Two actions, five sightings each. The agent is confident after about ten steps.</li>
-    <li><strong>It predicts where it has never been.</strong> Select a cell it has not visited. Its expectation there comes from the general rule for the action.</li>
+    <li><strong>It predicts where it has never been.</strong> Click a cell it has not visited. What it expects there is assumed from the general rule for each action.</li>
     <li><strong>It plans by chaining.</strong> The route to a far cell is built from one prediction after another.</li>
     <li><strong>It keeps learning.</strong> Each step toward a goal adds a specific entry for the cell it passed through.</li>
   </ul>

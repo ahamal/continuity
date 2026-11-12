@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { factsKey } from '../src/engine/facts';
-import { KnowledgeBase } from '../src/engine/knowledge-base';
+import { factsKey } from '../src/core/facts';
+import { KnowledgeBase } from '../src/core/knowledge-base';
 
 describe('factsKey', () => {
   it('ignores the order facts were written in', () => {

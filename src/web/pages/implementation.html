@@ -135,19 +135,21 @@
 
   <h2>What the world provides</h2>
   <p>
-    The agent sees a world only through a small interface: the list of actions, the current
-    state, the difference between two states, the distance between two states, and names for the
-    parts of a state. This is the built-in part, and stage 5 is about how much of it should stay
-    built in.
+    The world provides the list of actions, the current state, and names for the parts of a
+    state. The agent brings a representation: how a state becomes facts, how the difference
+    between two states is measured, and how far apart two states are. In stages 3 and 4 that
+    representation is raw coordinates. This is the built-in part, and stage 5 is about how much
+    of it should stay built in.
   </p>
 
   <h2>Where it is in the code</h2>
   <table class="facts-table">
     <tbody>
-      <tr><td><code>src/engine/</code></td><td>Facts and the knowledge base</td></tr>
-      <tr><td><code>src/agent/</code></td><td>Observe, predict, curiosity, plan, surprise</td></tr>
+      <tr><td><code>src/core/</code></td><td>Facts and the knowledge base</td></tr>
+      <tr><td><code>src/agents/</code></td><td>The agent and its parts: storing, predicting, curiosity, planning</td></tr>
       <tr><td><code>src/worlds/</code></td><td>The line, the grid and the ready-made scenarios</td></tr>
-      <tr><td><code>src/experiments/</code></td><td>Command-line runs</td></tr>
+      <tr><td><code>src/runs/</code></td><td>Connects an agent to a world and records what happens</td></tr>
+      <tr><td><code>src/experiments/</code></td><td>Command-line runs and the benchmark</td></tr>
       <tr><td><code>src/web/</code></td><td>These pages</td></tr>
     </tbody>
   </table>

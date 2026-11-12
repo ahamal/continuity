@@ -1,5 +1,5 @@
-import type { Facts } from '../engine/facts';
-import { type Action, type GridWorld, type State, clamp } from './world';
+import type { Action, State } from '../core/state';
+import { type GridWorld, clamp } from './world';
 
 export interface Grid1DOptions {
   size?: number;
@@ -11,7 +11,8 @@ export interface Grid1DOptions {
 export class Grid1D implements GridWorld {
   readonly name = '1D line';
   readonly actions = ['left', 'right'] as const;
-  readonly diffKeys = ['dx'] as const;
+  readonly kind = 'grid' as const;
+  readonly stateParts = [{ name: 'pos', change: 'dx' }] as const;
   readonly width: number;
   readonly height = 1;
 
@@ -42,22 +43,6 @@ export class Grid1D implements GridWorld {
     return this.getState();
   }
 
-  distance(a: State, b: State): number {
-    return Math.abs(a[0]! - b[0]!);
-  }
-
-  computeDiff(before: State, after: State): Facts {
-    return { dx: after[0]! - before[0]! };
-  }
-
-  describe(state: State): Facts {
-    return { pos: state[0]! };
-  }
-
-  applyDiff(state: State, diff: Facts): State {
-    return [state[0]! + asNumber(diff.dx)];
-  }
-
   isWall(x: number, _y: number): boolean {
     return this.walls.has(x);
   }
@@ -69,8 +54,4 @@ export class Grid1D implements GridWorld {
   stateAt(x: number, _y: number): State {
     return [x];
   }
-}
-
-function asNumber(value: unknown): number {
-  return typeof value === 'number' ? value : 0;
 }

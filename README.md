@@ -13,15 +13,9 @@ them, and that handles the 1D and 2D grid worlds the same way.
 
 ## Stages
 
-The site records the work stage by stage, with the thinking behind each one.
-
-| # | Stage | State |
-|---|---|---|
-| 1 | Background theory | Written |
-| 2 | Implementation | Written |
-| 3 | 1D world | Runs |
-| 4 | 2D world, with and without walls | Runs |
-| 5 | Better representation of states | In progress |
+The site records the work stage by stage, with the thinking behind each one. Stages 1 to 4 are
+done and stage 5 is in progress. See [ROADMAP.md](ROADMAP.md) for all the stages and
+[ARCHITECTURE.md](ARCHITECTURE.md) for how the code is organised.
 
 Stages 3 and 4 are a port of the original Python engine, with the same behaviour.
 
@@ -42,21 +36,24 @@ Other commands:
 | `npm test` | Runs the tests |
 | `npm run typecheck` | Checks types |
 | `npm run demo -- 2d-walls --seed 3` | Runs a scenario in the terminal (`1d`, `2d`, `2d-walls`) |
+| `npm run bench` | Scores every recipe on every scenario over 500 seeds and saves the table in `results/` |
 | `npm run build` | Builds the site into `dist/` |
 
 ## Layout
 
 ```
 src/
-  engine/       facts and the knowledge base
-  agent/        observe, predict, curiosity, plan, surprise
+  core/         facts, the knowledge base, states
   worlds/       the line, the grid, and ready-made scenarios
-  experiments/  command-line runs
+  agents/       the agent, its parts, and one recipe per stage
+  runs/         connects an agent to a world; events, replay, benchmark
+  experiments/  command-line programs
   web/
     pages/      one page per stage
     lab/        the interactive view used by stages 3 and 4
 tests/
+results/        saved benchmark tables
 ```
 
-The engine and agent have no dependency on the browser, so the same code runs on the site and
-from the command line.
+Nothing below `web/` depends on the browser, so the same code runs on the site, in the tests
+and from the command line.

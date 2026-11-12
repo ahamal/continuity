@@ -1,3 +1,5 @@
+import { twoLevels } from '../../agents/recipes';
+import type { Recipe } from '../../agents/recipes';
 import { createLab } from '../lab/lab';
 import implementation from './implementation.html?raw';
 import states from './states.html?raw';
@@ -26,14 +28,15 @@ function prose(html: string): Page['mount'] {
 /**
  * A page with an interactive lab. The page marks where the lab goes with
  * `data-lab`, and may supply notes for the lab's Notes tab in a
- * `<template data-lab-notes>`.
+ * `<template data-lab-notes>`. Each lab page names the recipe for its stage,
+ * so the page keeps showing that stage's agent when later stages are added.
  */
-function withLab(html: string, scenarioIds: string[]): Page['mount'] {
+function withLab(html: string, recipe: Recipe, scenarioIds: string[]): Page['mount'] {
   return (container) => {
     container.innerHTML = html;
     const slot = container.querySelector<HTMLElement>('[data-lab]')!;
     const notes = container.querySelector<HTMLTemplateElement>('template[data-lab-notes]');
-    return createLab(slot, scenarioIds, notes?.innerHTML ?? '');
+    return createLab(slot, { recipe, scenarioIds, notesHtml: notes?.innerHTML ?? '' });
   };
 }
 
@@ -41,7 +44,7 @@ function withLab(html: string, scenarioIds: string[]): Page['mount'] {
 export const pages: Page[] = [
   { id: 'theory', label: 'Theory', mount: prose(theory) },
   { id: 'implementation', label: 'Implementation', mount: prose(implementation) },
-  { id: '1d', label: '1D world', layout: 'lab', mount: withLab(world1d, ['1d']) },
-  { id: '2d', label: '2D world', layout: 'lab', mount: withLab(world2d, ['2d', '2d-walls']) },
+  { id: '1d', label: '1D world', layout: 'lab', mount: withLab(world1d, twoLevels, ['1d']) },
+  { id: '2d', label: '2D world', layout: 'lab', mount: withLab(world2d, twoLevels, ['2d', '2d-walls']) },
   { id: 'states', label: 'State representation', current: true, mount: prose(states) },
 ];

@@ -16,6 +16,16 @@ export interface Entry {
   readonly outcomes: Map<string, Outcome>;
 }
 
+/** What one call to `observe` did to the store. */
+export interface Write {
+  /** Key of the entry that was written to. */
+  key: string;
+  /** True when the entry did not exist before. */
+  createdEntry: boolean;
+  /** True when this outcome had not been seen for the entry before. */
+  createdOutcome: boolean;
+}
+
 export interface QueryResult {
   /** The value of the fact that was asked for. */
   value: Value;
@@ -38,9 +48,10 @@ export class KnowledgeBase {
   private readonly byKey = new Map<string, Entry>();
 
   /** Record that `inputs` were followed by `outputs`. */
-  observe(inputs: Facts, outputs: Facts): void {
+  observe(inputs: Facts, outputs: Facts): Write {
     const key = factsKey(inputs);
     let entry = this.byKey.get(key);
+    const createdEntry = !entry;
     if (!entry) {
       entry = { key, inputs, outcomes: new Map() };
       this.byKey.set(key, entry);
@@ -48,11 +59,13 @@ export class KnowledgeBase {
 
     const outcomeKey = factsKey(outputs);
     let outcome = entry.outcomes.get(outcomeKey);
+    const createdOutcome = !outcome;
     if (!outcome) {
       outcome = { value: outputs, count: 0 };
       entry.outcomes.set(outcomeKey, outcome);
     }
     outcome.count += 1;
+    return { key, createdEntry, createdOutcome };
   }
 
   /**
@@ -82,6 +95,10 @@ export class KnowledgeBase {
     }
 
     return best;
+  }
+
+  get(key: string): Entry | undefined {
+    return this.byKey.get(key);
   }
 
   /** All entries, in the order they were first seen. */

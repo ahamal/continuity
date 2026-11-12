@@ -4,17 +4,18 @@
 //   npm run demo -- 2d
 //   npm run demo -- 2d-walls --seed 7
 
-import { Agent } from '../agent/agent';
-import type { AgentEvent } from '../agent/events';
-import { blockedMoves } from '../agent/inspect';
-import { seededRandom } from '../agent/random';
+import { blockedMoves } from '../agents/inspect';
+import { twoLevels } from '../agents/recipes';
+import { formatState } from '../core/state';
+import type { RunEvent } from '../runs/events';
+import { Run } from '../runs/run';
 import { findScenario, scenarios } from '../worlds/scenarios';
-import { formatState } from '../worlds/world';
+import { isGridWorld, openStates } from '../worlds/world';
 
-function describe(event: AgentEvent): string {
+function describe(event: RunEvent): string {
   switch (event.type) {
-    case 'explore-step':
-      return `step ${event.index}: ${formatState(event.from)} --${event.action}--> ${formatState(event.to)}  (curiosity: ${event.curiosity.toFixed(2)})`;
+    case 'explore':
+      return '=== EXPLORATION PHASE ===\n';
     case 'confident':
       return `\n>>> CONFIDENT after ${event.steps} steps!\n`;
     case 'explore-exhausted':
@@ -24,16 +25,19 @@ function describe(event: AgentEvent): string {
     case 'plan':
       return `Plan from ${formatState(event.from)}: [${event.path.join(', ')}] (${event.status})`;
     case 'step': {
-      const move = `  ${formatState(event.from)} --${event.action}--> ${formatState(event.to)}`;
-      if (!event.surprise) return move;
-      return `${move}  SURPRISE! (expected ${formatState(event.expected!)})\n  Re-planning...`;
+      const move = `${formatState(event.from)} --${event.action}--> ${formatState(event.to)}`;
+      if (event.phase === 'explore') {
+        return `${move}  (curiosity: ${event.choice!.curiosity.toFixed(2)})`;
+      }
+      if (!event.surprise) return `  ${move}`;
+      return `  ${move}  SURPRISE! (expected ${formatState(event.expected!.state)})\n  Re-planning...`;
     }
     case 'reached':
-      return `Reached goal in ${event.steps} steps!`;
+      return `Reached goal in ${event.steps} steps!\n`;
     case 'no-path':
-      return 'No path found!';
+      return 'No path found!\n';
     case 'max-replans':
-      return 'Max replans reached';
+      return 'Max replans reached\n';
   }
 }
 
@@ -49,26 +53,31 @@ function main(): void {
     process.exit(1);
   }
 
-  const world = scenario.create();
-  const agent = new Agent(world, { random: seededRandom(seed) });
+  const run = new Run({ recipe: twoLevels, scenario, seed });
+  let printed = 0;
+  const print = () => {
+    for (; printed < run.events.length; printed++) console.log(describe(run.events[printed]!));
+  };
 
   console.log(`=== ${scenario.label.toUpperCase()} (seed ${seed}) ===\n`);
-  console.log('=== EXPLORATION PHASE ===\n');
-  for (const event of agent.explore(scenario.exploreSteps)) console.log(describe(event));
+  run.do({ type: 'explore' });
+  print();
 
   console.log('=== GOAL-DIRECTED EXECUTION ===\n');
   for (const goal of scenario.goals) {
-    for (const event of agent.executePlan(goal)) console.log(describe(event));
-    console.log();
+    run.do({ type: 'goal', goal });
+    print();
   }
 
-  const blocked = blockedMoves(agent, world);
-  console.log('=== LEARNED: ACTIONS THAT DO NOTHING ===\n');
-  if (blocked.length === 0) console.log('  (none)');
-  for (const move of blocked) {
-    console.log(`  at ${formatState(move.state)}, ${move.action} does nothing (seen ${move.count}x)`);
+  if (isGridWorld(run.world)) {
+    const blocked = blockedMoves(run.agent, openStates(run.world));
+    console.log('=== LEARNED: ACTIONS THAT DO NOTHING ===\n');
+    if (blocked.length === 0) console.log('  (none)');
+    for (const move of blocked) {
+      console.log(`  at ${formatState(move.state)}, ${move.action} does nothing (seen ${move.count}x)`);
+    }
   }
-  console.log(`\nKnowledge base: ${agent.kb.size} entries`);
+  console.log(`\nKnowledge base: ${run.agent.kb.size} entries`);
 }
 
 main();

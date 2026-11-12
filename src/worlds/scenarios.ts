@@ -1,6 +1,7 @@
 import { Grid1D } from './grid1d';
 import { Grid2D } from './grid2d';
-import type { GridWorld, State } from './world';
+import type { State } from '../core/state';
+import type { World } from './world';
 
 /** A ready-made world with a set of goals to try in it. */
 export interface Scenario {
@@ -8,7 +9,7 @@ export interface Scenario {
   label: string;
   description: string;
   /** Build a fresh copy of the world. */
-  create(): GridWorld;
+  create(): World;
   /** The most steps the agent may spend exploring. */
   exploreSteps: number;
   goals: State[];
