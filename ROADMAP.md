@@ -5,11 +5,13 @@ several board games with no knowledge of them, extracts how they work, and plays
 there is nothing to watch, it learns by trying things out of curiosity. What it has learned can
 be read.
 
-The work is done in parts. The site is five written pages. Two of them have small labs
+The work is done in parts. The site is seven written pages. Four of them have a small lab
 between their paragraphs, each showing one agent. Page numbers come from the order of the
 pages and are written nowhere else, so pages are referred to by name.
 
 ## Part 1: the problem
+
+Finished. `PART-2-HANDOVER.md` says where it ended and what comes next.
 
 What the agent stores, what that cannot express, and what happens when less and less is
 decided in advance. The aim of this part is to understand, not to make anything small or fast.

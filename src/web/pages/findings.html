@@ -68,15 +68,15 @@
     <li>
       <strong>General and specific rows work together when the specific one answers.</strong>
       The second agent let the rows vote and did worse than the first. The third agent uses the
-      same rows and follows the most specific one. Every row in its hierarchy is then right
-      every time within its own range.
+      same rows and follows the most specific one, so a general row and a specific row beneath
+      it no longer compete.
     </li>
     <li>
       <strong>Only a row that has held every time should answer for the general one.</strong>
       The third agent followed "going right at x = 4 changes nothing" after it had held only 3
       times out of 5, and kept going round the wall the long way. The fourth agent drops a row
       the first time it fails, and takes the shorter way. The edge, which has never failed,
-      stays one row.
+      stays one row. Every row that answers is then right every time within its own range.
     </li>
     <li>
       <strong>Being wrong needs nothing extra.</strong> A wrong prediction is written like any

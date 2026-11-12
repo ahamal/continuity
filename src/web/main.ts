@@ -12,6 +12,16 @@ import { type Page, pages, parts } from './pages';
 const pageEl = document.querySelector<HTMLElement>('#page')!;
 const navEl = document.querySelector<HTMLElement>('#stage-nav')!;
 const pagerEl = document.querySelector<HTMLElement>('#pager')!;
+const sidebarEl = document.querySelector<HTMLElement>('.sidebar')!;
+const navToggleEl = document.querySelector<HTMLButtonElement>('#nav-toggle')!;
+
+/** On a phone the list of pages is closed until asked for. */
+function setNavOpen(open: boolean): void {
+  sidebarEl.toggleAttribute('data-open', open);
+  navToggleEl.setAttribute('aria-expanded', String(open));
+}
+
+navToggleEl.addEventListener('click', () => setNavOpen(!sidebarEl.hasAttribute('data-open')));
 
 let cleanup: (() => void) | void;
 
@@ -92,6 +102,7 @@ function show(): void {
   renderNav(page);
   renderPager(page);
   document.title = `${page.label} · Continuity`;
+  setNavOpen(false);
   window.scrollTo(0, 0);
 }
 

@@ -3,6 +3,8 @@
 Read `ROADMAP.md` for the goal and stages, and `ARCHITECTURE.md` for the layers and the rules
 for adding a stage. Follow both.
 
+Part 1 is finished. To start Part 2, read `PART-2-HANDOVER.md` first.
+
 - Never edit a part that an earlier stage's recipe uses. Add a new part and a new recipe.
 - After any change to `core`, `agents`, `worlds` or `runs`, run `npm test`. The pinned results
   in `tests/runs.test.ts` must not change.

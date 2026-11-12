@@ -133,6 +133,12 @@
       this agent would follow only its general rows.
     </p>
     <p>
+      The general row is chosen by how many moves it has been right about. Early on, a row
+      about a place can have more moves behind it than the row about the move, and then the
+      agent would answer for a move from what it saw of a place. On the grid with a wall this
+      did not happen once in its usual exploring, but nothing rules it out.
+    </p>
+    <p>
       Everything else we hand it is unchanged from the third agent: the facts themselves, that
       the question is what will change, and writing every combination, which does not scale.
     </p>
