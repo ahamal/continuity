@@ -129,6 +129,5 @@ chess.
 
 ## Git
 
-Part 1 is on the branch `part-1-pages`, pushed to `origin`. `main` has not been moved up to
-it. Check `git status` and `git log` before starting: the last edits of Part 1 may not be
-committed.
+Part 1 is on `main`, pushed to `origin`. The branch `part-1-pages` is at the same commit and
+is where the work was done. Check `git status` and `git log` before starting.
