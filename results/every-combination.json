@@ -1,0 +1,38 @@
+[
+  {
+    "recipe": "every-combination",
+    "scenario": "1d",
+    "seeds": 500,
+    "solved": 500,
+    "failed": 0,
+    "meanExploreSteps": 10.83,
+    "meanGoalSteps": 15.95,
+    "meanSurprises": 0,
+    "meanEntries": 209.13,
+    "greedyPlans": 0
+  },
+  {
+    "recipe": "every-combination",
+    "scenario": "2d",
+    "seeds": 500,
+    "solved": 500,
+    "failed": 0,
+    "meanExploreSteps": 21.06,
+    "meanGoalSteps": 36.71,
+    "meanSurprises": 0,
+    "meanEntries": 4934.38,
+    "greedyPlans": 1500
+  },
+  {
+    "recipe": "every-combination",
+    "scenario": "2d-walls",
+    "seeds": 500,
+    "solved": 367,
+    "failed": 133,
+    "meanExploreSteps": 21.06,
+    "meanGoalSteps": 15.39,
+    "meanSurprises": 3.81,
+    "meanEntries": 3043.84,
+    "greedyPlans": 673
+  }
+]

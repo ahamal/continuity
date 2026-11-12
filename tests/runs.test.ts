@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { blockedMoves } from '../src/agents/inspect';
-import { twoLevels } from '../src/agents/recipes';
+import { everyRow, twoLevels } from '../src/agents/recipes';
 import { bench } from '../src/runs/bench';
 import { Run, replay } from '../src/runs/run';
 import { summarise } from '../src/runs/summary';
@@ -91,4 +91,11 @@ describe('pinned results', () => {
     expect(solved('2d')).toBe(500);
     expect(solved('2d-walls')).toBe(367);
   });
+
+  it('stage 8 (every row has a say), seeds 1 to 500', () => {
+    const solved = (id: string) => bench(everyRow, findScenario(id)!, 500).solved;
+    expect(solved('1d')).toBe(500);
+    expect(solved('2d')).toBe(131);
+    expect(solved('2d-walls')).toBe(59);
+  }, 60_000);
 });

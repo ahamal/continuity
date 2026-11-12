@@ -67,7 +67,7 @@ export function renderLastMove(el: HTMLElement, summary: Summary): void {
       `${formatState(step.from)} `,
       h('b', { class: `via via-${step.phase}` }, actionIcon(step.action, 13), step.action),
       stayed ? ' → stayed' : ` → ${formatState(step.to)}`),
-    h('span', { class: 'muted' }, why),
-    outcome,
+    // Always on a second line of its own, so the line count never changes.
+    h('span', { class: 'move-why' }, h('span', { class: 'muted' }, why), outcome),
   );
 }

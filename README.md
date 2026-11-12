@@ -13,8 +13,9 @@ them, and that handles the 1D and 2D grid worlds the same way.
 
 ## Stages
 
-The site records the work stage by stage, with the thinking behind each one. Stages 1 to 5 are
-done and stage 6 is in progress. See [ROADMAP.md](ROADMAP.md) for all the stages and
+The site records the work stage by stage, with the thinking behind each one. Part 1, the
+problem, is stages 1 to 8. Part 2, working backwards from continuities written by hand, has
+not started. See [ROADMAP.md](ROADMAP.md) for all the stages and
 [ARCHITECTURE.md](ARCHITECTURE.md) for how the code is organised.
 
 Stages 3 to 5 are a port of the original Python engine, with the same behaviour.

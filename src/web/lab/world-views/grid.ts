@@ -1,6 +1,6 @@
 // The drawing for grid worlds (the line and the 2D grid).
 
-import { blockedMoves } from '../../../agents/inspect';
+import { blockedMoves, expectedStays } from '../../../agents/inspect';
 import { type State, sameState, stateKey } from '../../../core/state';
 import { type GridWorld, openStates } from '../../../worlds/world';
 import { s } from '../dom';
@@ -131,7 +131,7 @@ export function createGridView(
 
     // Moves the agent has learned do nothing: a bar on the side it cannot pass.
     blocked.replaceChildren();
-    for (const move of blockedMoves(run.agent, open)) {
+    for (const move of scene.stays === 'expected' ? expectedStays(run.agent, open) : blockedMoves(run.agent, open)) {
       if (!move.wouldBe) continue;
       const from = grid.cellOf(move.state);
       const to = grid.cellOf(move.wouldBe);

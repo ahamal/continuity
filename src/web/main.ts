@@ -7,7 +7,7 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '@fontsource/ibm-plex-mono/600.css';
 import './style.css';
-import { type Page, pages } from './pages';
+import { type Page, pages, parts } from './pages';
 
 const pageEl = document.querySelector<HTMLElement>('#page')!;
 const navEl = document.querySelector<HTMLElement>('#stage-nav')!;
@@ -24,29 +24,39 @@ function currentPage(): Page {
 
 function renderNav(active: Page): void {
   navEl.innerHTML = '';
-  for (const page of pages) {
-    const link = document.createElement('a');
-    link.href = `#/${page.id}`;
-    link.className = 'stage-link';
-    if (page === active) link.setAttribute('aria-current', 'page');
-
-    const number = document.createElement('span');
-    number.className = 'stage-number';
-    number.textContent = stageNumber(page);
-
-    const label = document.createElement('span');
-    label.className = 'stage-label';
-    label.textContent = page.label;
-
-    link.append(number, label);
-    if (page.current) {
-      const badge = document.createElement('span');
-      badge.className = 'stage-badge';
-      badge.textContent = 'now';
-      link.append(badge);
-    }
-    navEl.append(link);
+  for (const part of parts) {
+    const heading = document.createElement('p');
+    heading.className = 'stage-part';
+    const note = document.createElement('small');
+    note.textContent = part.note;
+    heading.append(part.label, note);
+    navEl.append(heading);
+    for (const page of pages.filter((candidate) => candidate.part === part.id)) navEl.append(stageLink(page, active));
   }
+}
+
+function stageLink(page: Page, active: Page): HTMLElement {
+  const link = document.createElement('a');
+  link.href = `#/${page.id}`;
+  link.className = 'stage-link';
+  if (page === active) link.setAttribute('aria-current', 'page');
+
+  const number = document.createElement('span');
+  number.className = 'stage-number';
+  number.textContent = stageNumber(page);
+
+  const label = document.createElement('span');
+  label.className = 'stage-label';
+  label.textContent = page.label;
+
+  link.append(number, label);
+  if (page.current) {
+    const badge = document.createElement('span');
+    badge.className = 'stage-badge';
+    badge.textContent = 'now';
+    link.append(badge);
+  }
+  return link;
 }
 
 function renderPager(active: Page): void {

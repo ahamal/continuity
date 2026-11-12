@@ -12,10 +12,9 @@ import { Controller } from './controller';
 import { cx, h, put } from './dom';
 import { icon, icons } from './icons';
 import { lookupsAt } from '../../agents/inspect';
-import { formatFacts } from './words';
-import { type Sort, renderKnowledge } from './panels/knowledge';
+import { renderCombinations } from './panels/combinations';
+import { type Sort, renderAsking, renderKnowledge } from './panels/knowledge';
 import { renderLearning } from './panels/learning';
-import { renderLookup } from './panels/lookup';
 import { renderActivity, renderLastMove } from './panels/state';
 import { createTimeline } from './panels/timeline';
 import { type WorldView, createWorldView } from './world-views';
@@ -25,6 +24,16 @@ export interface LabOptions {
   scenarioIds: string[];
   /** Where the world picker, seed and "Start over" go. Usually the page header. */
   setupSlot?: HTMLElement | null;
+  /**
+   * How the knowledge base is laid out. `rows`: one table of every row, for an
+   * agent that stores few. `combinations`: rows grouped by which items they
+   * have, for an agent that stores every combination.
+   */
+  knowledge?: 'rows' | 'combinations';
+  /** Which "this move does nothing" beliefs the world shows. See `Scene.stays`. */
+  stays?: 'seen' | 'expected';
+  /** Which row's count decides trust, in words. It depends on the agent. */
+  trustedRow?: string;
 }
 
 const SPEEDS: [label: string, perSecond: number][] = [
@@ -41,6 +50,9 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   let selected: State | null = null;
   let view: WorldView;
   let sort: Sort = 'written';
+  const grouped = options.knowledge === 'combinations';
+  /** The combination whose rows are shown, when the knowledge base is grouped. */
+  let picked: string | null = null;
 
   // State side.
   const activityEl = h('span', { class: 'pill', 'aria-live': 'polite' });
@@ -52,9 +64,13 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   // Knowledge side.
   // First what is stored, then what the code reads out of it.
   const kbAsideEl = h('span', { class: 'panel-aside' });
+  const askingEl = h('p', { class: 'asking' });
   const knowledgeEl = h('div', { class: 'panel-body panel-scroll' });
-  const lookupNameEl = h('span', { class: 'panel-note' });
-  const lookupEl = h('div', { class: 'panel-body' });
+  // Used instead of `knowledgeEl` when the knowledge base is grouped: the
+  // combinations on the left, the rows of the picked one on the right. Each
+  // scrolls by itself and is kept between moves, so it stays where it was.
+  const combosEl = h('div', { class: 'split-index' });
+  const combosRowsEl = h('div', { class: 'panel-body split-rows' });
   const learningEl = h('div', { class: 'panel-body' });
   // Set-up: chosen before a run, so it sits apart from both sides.
   const setupEl = options.setupSlot ?? h('div', { class: 'setup' });
@@ -74,14 +90,14 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   const timeline = createTimeline(timelineEl, seek);
 
   container.replaceChildren(
-    h('div', { class: 'lab' },
+    h('div', { class: cx('lab', grouped && 'lab-grouped') },
       !options.setupSlot && setupEl,
       h('div', { class: 'col' },
         panel('state', icons.state, 'State', activityEl,
           worldEl,
           h('p', { class: 'legend' },
             h('span', null, h('i', { class: 'lg lg-visited' }), 'been here'),
-            h('span', null, h('i', { class: 'lg lg-blocked' }), 'learned: no way through'),
+            h('span', null, h('i', { class: 'lg lg-blocked' }), options.stays === 'expected' ? 'expects no way through' : 'learned: no way through'),
             h('span', null, h('i', { class: 'lg lg-route' }), 'plan'),
             h('span', null, h('i', { class: 'lg lg-surprise' }), 'surprise')),
           lastMoveEl,
@@ -89,8 +105,10 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
         h('section', { class: 'panel panel-controls' }, controlsEl, h('div', { class: 'time-row' }, timelineEl, speedEl)),
       ),
       h('div', { class: 'col' },
-        panel('entries', icons.entries, 'Knowledge base', kbAsideEl, knowledgeEl),
-        panel('lookup', icons.cell, 'Lookup', lookupNameEl, lookupEl),
+        grouped
+          ? panel('entries', icons.entries, 'Knowledge base', kbAsideEl,
+              h('div', { class: 'split' }, combosEl, h('div', { class: 'split-main' }, askingEl, combosRowsEl)))
+          : panel('entries', icons.entries, 'Knowledge base', kbAsideEl, askingEl, knowledgeEl),
         panel('learning', icons.knowledge, 'Confidence', h('span', { class: 'panel-note' }, 'derived'), learningEl),
       ),
     ),
@@ -190,29 +208,10 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
     );
   }
 
-  function render(): void {
-    if (!view) return;
-    const run = controller.view;
-    const summary = summarise(run.events);
-    const position = run.world.getState();
-    const stops = controller.stops();
-    /** The position just after move number `move`. */
-    const afterMove = (move: number) => {
-      let seen = 0;
-      const index = controller.head.events.findIndex((event) => event.type === 'step' && ++seen === move);
-      return stops.find((stop) => stop > index) ?? controller.head.events.length;
-    };
-
-    renderSetup();
-
-    renderActivity(activityEl, summary, position);
-    view.update({ run, summary, selected });
-    renderLastMove(lastMoveEl, summary);
-    renderControls(run.agent.isConfident(), position);
-    timeline.update({ events: controller.head.events, cursor: controller.cursor, stops });
-
-    // The situation being looked up: the selected cell, else where the last
-    // move started (the question the agent actually asked), else where it is.
+  /** The knowledge base as one table, marked for the situation being asked about. */
+  function renderRows(run: Controller['view'], summary: ReturnType<typeof summarise>, position: State, onShowMove: (move: number) => void): void {
+    // The situation the table is marked for: the selected cell, else where the
+    // last move started (the question the agent actually asked), else where it is.
     const last = summary.lastStep;
     const situation = selected ?? last?.from ?? position;
     const lookups = lookupsAt(run.agent, situation);
@@ -232,20 +231,60 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
           }, label)),
       ),
     );
-    renderKnowledge(knowledgeEl, { agent: run.agent, summary, sort, matched, answered, onShowMove: (move) => seek(afterMove(move)) });
+    renderKnowledge(knowledgeEl, { agent: run.agent, summary, sort, matched, answered, onShowMove });
 
-    lookupNameEl.textContent = `at ${formatState(situation)}: ${selected ? 'the selected cell' : last ? 'where the last move started' : 'where the agent is'}`;
-    renderLookup(lookupEl, {
-      state: situation,
-      lookups,
-      taken: !selected && last ? last.action : null,
-      factsOf: (key) => {
-        const entry = run.agent.kb.get(key);
-        return entry ? formatFacts(entry.inputs) : key;
-      },
+    renderAsking(askingEl, {
+      facts: run.agent.representation.describe(situation),
+      where: selected ? 'the selected cell' : last ? 'where the last move started' : 'where the agent is',
     });
+  }
 
-    renderLearning(learningEl, { agent: run.agent, summary, possibleMoves: view.states().length * run.agent.actions.length });
+  function render(): void {
+    if (!view) return;
+    const run = controller.view;
+    const summary = summarise(run.events);
+    const position = run.world.getState();
+    const stops = controller.stops();
+    /** The position just after move number `move`. */
+    const afterMove = (move: number) => {
+      let seen = 0;
+      const index = controller.head.events.findIndex((event) => event.type === 'step' && ++seen === move);
+      return stops.find((stop) => stop > index) ?? controller.head.events.length;
+    };
+
+    renderSetup();
+
+    renderActivity(activityEl, summary, position);
+    view.update({ run, summary, selected, stays: options.stays ?? 'seen' });
+    renderLastMove(lastMoveEl, summary);
+    renderControls(run.agent.isConfident(), position);
+    timeline.update({ events: controller.head.events, cursor: controller.cursor, stops });
+
+    const onShowMove = (move: number) => seek(afterMove(move));
+    if (grouped) {
+      put(kbAsideEl, h('span', { class: 'panel-note' }, `${run.agent.kb.size} rows`));
+      renderCombinations(combosEl, askingEl, combosRowsEl, {
+        agent: run.agent,
+        summary,
+        answered: new Set(summary.lastStep?.expected?.basis ?? []),
+        picked,
+        onPick: (id) => {
+          picked = id;
+          combosRowsEl.scrollTop = 0;
+          render();
+        },
+        onShowMove,
+      });
+    } else {
+      renderRows(run, summary, position, onShowMove);
+    }
+
+    renderLearning(learningEl, {
+      agent: run.agent,
+      summary,
+      possibleMoves: view.states().length * run.agent.actions.length,
+      trustedRow: options.trustedRow ?? "the action's one-fact row",
+    });
   }
 
   function onKey(event: KeyboardEvent): void {

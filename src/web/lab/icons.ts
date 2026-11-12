@@ -3,14 +3,13 @@
 
 import {
   Activity, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Brain, CircleCheck, CircleHelp, CircleX,
-  Compass, Database, Dices, Flag, Gauge, Hourglass, type IconNode, MapPin, Navigation, Pause, Play,
+  Compass, Database, Dices, Flag, Gauge, Hourglass, type IconNode, Navigation, Pause, Play,
   RotateCcw, SkipBack, SkipForward, Sprout, StepBack, StepForward, createElement,
 } from 'lucide';
 
 export const icons = {
   state: Activity,
   knowledge: Brain,
-  cell: MapPin,
   entries: Database,
   explore: Compass,
   goal: Flag,

@@ -161,6 +161,23 @@ a {
   text-decoration: none;
 }
 
+/* The name of a part, above its stages. */
+.stage-part {
+  margin: 12px 0 2px;
+  padding: 0 16px;
+  color: var(--ink-3);
+  font: 600 10px/1.6 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stage-part small {
+  display: block;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .stage-link:hover {
   background: var(--paper-2);
   color: var(--ink);
@@ -1071,17 +1088,49 @@ body[data-layout='lab'] .pager {
     linear-gradient(-45deg, transparent 42%, var(--alarm) 42% 58%, transparent 58%);
 }
 
+/*
+  Two lines, always: the move, then why it was made and how it turned out. The
+  height is fixed and text that does not fit is cut, so the world above never
+  moves.
+*/
 .last-move {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  flex: none;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: 22px 20px;
   align-items: center;
-  gap: 2px 14px;
-  min-height: 44px;
+  column-gap: 14px;
+  height: 60px;
   margin: 0;
   padding: 8px 14px;
+  overflow: hidden;
+  white-space: nowrap;
   border-top: 1px solid var(--line);
   border-radius: 0 0 3px 3px;
   background: color-mix(in srgb, var(--bench) 45%, var(--panel));
+}
+
+.last-move > :only-child {
+  grid-column: 1 / -1;
+}
+
+.move-why {
+  display: flex;
+  grid-column: 2;
+  gap: 14px;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12.5px;
+}
+
+.move-why > :first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.move-why > :last-child {
+  flex: none;
 }
 
 .move-n {
@@ -1212,7 +1261,6 @@ body[data-layout='lab'] .pager {
   gap: 12px;
 }
 
-.panel-lookup,
 .panel-learning {
   flex: none;
 }
@@ -1232,10 +1280,6 @@ body[data-layout='lab'] .pager {
   color: var(--ink-3);
 }
 
-.is-latest .action {
-  background: var(--bench);
-}
-
 .fact {
   display: inline-block;
   margin: 1px 4px 1px 0;
@@ -1249,24 +1293,20 @@ body[data-layout='lab'] .pager {
 }
 
 /* The stored table. */
-.kb,
-.lookup {
+.kb {
   width: 100%;
   border-collapse: collapse;
 }
 
 .kb th,
-.kb td,
-.lookup th,
-.lookup td {
+.kb td {
   padding: 4px 12px 4px 8px;
   border-top: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
 }
 
-.kb thead th,
-.lookup thead th {
+.kb thead th {
   position: sticky;
   top: -12px;
   z-index: 1;
@@ -1278,10 +1318,6 @@ body[data-layout='lab'] .pager {
   font: 600 11px var(--sans);
   letter-spacing: 0.07em;
   text-transform: uppercase;
-}
-
-.lookup thead th {
-  position: static;
 }
 
 .kb td {
@@ -1299,15 +1335,13 @@ body[data-layout='lab'] .pager {
 }
 
 .kb-count,
-.kb-move,
-.lk-n,
-.lk-out {
+.kb-move {
   width: 1%;
   text-align: right !important;
   white-space: nowrap;
 }
 
-/* Rows that apply to the lookup below, and the rows that answered it. */
+/* Rows that apply to the situation asked about, and the rows that answer it. */
 .kb tr.is-match td {
   background: color-mix(in srgb, var(--bench) 65%, transparent);
 }
@@ -1336,26 +1370,184 @@ body[data-layout='lab'] .pager {
   box-shadow: inset 3px 0 0 var(--alarm);
 }
 
-/* The lookup. */
-.lk-rule {
-  margin: 0 0 8px !important;
-  color: var(--ink-2);
-  font-size: 12.5px;
-}
-
-.lookup th {
-  width: 86px;
-  font-weight: 400;
-}
-
-.lookup td {
+/* The line above the table: the situation the marks are for. One line, fixed height. */
+.asking {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  margin: 0;
+  padding: 0 14px;
   overflow: hidden;
-  font: 12.5px/1.75 var(--mono);
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
   white-space: nowrap;
 }
 
-.lk-by .muted {
-  font-family: var(--sans);
+.asking-label {
+  color: var(--ink-2);
+}
+
+.asking > * {
+  flex: none;
+}
+
+/* The only part allowed to give way when the panel is narrow. */
+.asking > .asking-where {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.asking-key {
+  display: inline-flex;
+  gap: 14px;
+  margin-left: auto;
+  color: var(--ink-3);
+}
+
+.asking-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mark {
+  width: 14px;
+  height: 12px;
+  border-left: 3px solid transparent;
+  background: color-mix(in srgb, var(--bench) 65%, transparent);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.mark-answer {
+  border-left-color: var(--ink);
+  background: var(--bench);
+}
+
+/* The grouped knowledge base needs the wider side. */
+.lab-grouped {
+  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+}
+
+.alone-key {
+  margin: 0;
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font: 12px/1.5 var(--mono);
+}
+
+/* A knowledge base grouped by combination: the combinations, then the rows of one. */
+.split {
+  display: grid;
+  flex: 1;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+.split-index {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  border-right: 1px solid var(--line);
+}
+
+.split-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.split-rows {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.combos {
+  border-collapse: collapse;
+  font: 12px/1.5 var(--mono);
+}
+
+.combos th,
+.combos td {
+  padding: 3px 5px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.combos thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 36px;
+  border-top: 0;
+  background: var(--panel);
+  box-shadow: inset 0 -1px 0 var(--line);
+  color: var(--ink-3);
+  font: 600 11px var(--mono);
+}
+
+.combos th:first-child,
+.combos td:first-child {
+  padding-left: 12px;
+}
+
+.combos tbody tr {
+  cursor: pointer;
+}
+
+.combos tbody tr:hover td {
+  background: color-mix(in srgb, var(--bench) 65%, transparent);
+}
+
+.combos tbody tr.is-on td {
+  background: var(--bench);
+  box-shadow: inset 0 1px 0 var(--ink-3), inset 0 -1px 0 var(--ink-3);
+}
+
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-2);
+}
+
+.combos .co-n {
+  width: 5ch;
+  padding-left: 10px;
+  color: var(--ink);
+  text-align: right;
+}
+
+.combos .co-new {
+  width: 4ch;
+  padding-right: 10px;
+  color: var(--ink-3);
+  text-align: right;
+}
+
+/* How often one fact was seen at all, beside the fact. */
+.alone {
+  margin-left: 7px;
+  padding-left: 6px;
+  border-left: 1px solid var(--line);
+  color: var(--ink-3);
+  font-style: normal;
+}
+
+.kb tr.is-touched td {
+  background: color-mix(in srgb, var(--bench) 65%, transparent);
+}
+
+.combos .co-ans {
+  width: 4ch;
+  padding-right: 10px;
 }
 
 /* Confidence. */

@@ -13,6 +13,12 @@ export interface Scene {
   run: Run;
   summary: Summary;
   selected: State | null;
+  /**
+   * Which "this move does nothing" beliefs to draw. `seen`: only cases the
+   * agent has seen for itself. `expected`: every case it expects, including
+   * ones carried over from elsewhere.
+   */
+  stays: 'seen' | 'expected';
 }
 
 /** A drawing of one kind of world. Each kind of world brings its own. */

@@ -1,5 +1,5 @@
-// Knowledge side, derived: confidence. The agent trusts an action once its
-// one-fact row has been seen a fixed number of times. Curiosity is what is
+// Knowledge side, derived: confidence. The agent trusts an action once one
+// row about it has been seen a fixed number of times. Curiosity is what is
 // left. Also how many moves the agent has made itself.
 
 import type { Agent } from '../../../agents/agent';
@@ -12,6 +12,8 @@ export interface LearningProps {
   summary: Summary;
   /** How many different moves exist in this world, if that can be counted. */
   possibleMoves: number | null;
+  /** Which row's count decides trust, in words. It depends on what the agent stores. */
+  trustedRow: string;
 }
 
 export function renderLearning(el: HTMLElement, props: LearningProps): void {
@@ -32,7 +34,7 @@ export function renderLearning(el: HTMLElement, props: LearningProps): void {
   put(el,
     h('div', { class: 'trusts' }, ...items),
     h('p', { class: 'muted derived-note' },
-      `Trusted once the action's one-fact row is seen ${needed} times (fixed in the code). `,
+      `Trusted once ${props.trustedRow} is seen ${needed} times (fixed in the code). `,
       props.possibleMoves !== null && `It has made ${tried} of ${props.possibleMoves} possible moves itself.`),
   );
 }

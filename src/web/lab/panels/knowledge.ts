@@ -15,7 +15,7 @@ export interface KnowledgeProps {
   agent: Agent;
   summary: Summary;
   sort: Sort;
-  /** Keys of entries that apply to the situation shown in the lookup panel. */
+  /** Keys of entries that apply to the situation being asked about. */
   matched: ReadonlySet<string>;
   /** Keys of the entries that answered it. */
   answered: ReadonlySet<string>;
@@ -27,6 +27,28 @@ const LIMIT = 400;
 
 const chips = (facts: Facts) =>
   formatFacts(facts).split(', ').map((fact) => h('span', { class: 'fact' }, fact));
+
+export interface AskingProps {
+  /** The situation as the agent describes it, without an action. */
+  facts: Facts;
+  /** Which situation that is, in words. */
+  where: string;
+}
+
+/**
+ * The one line above the table: which situation the marked rows are for, and
+ * what the two marks mean. The marks are worked out from the table, not stored.
+ */
+export function renderAsking(el: HTMLElement, props: AskingProps): void {
+  put(el,
+    h('span', { class: 'asking-label' }, 'Asking about'),
+    h('span', null, ...chips(props.facts)),
+    h('span', { class: 'muted asking-where' }, props.where),
+    h('span', { class: 'asking-key' },
+      h('span', { title: 'Every fact of the row is true of this situation.' }, h('i', { class: 'mark mark-match' }), 'applies'),
+      h('span', { title: 'Of the rows that apply, the one with the most facts answers.' }, h('i', { class: 'mark mark-answer' }), 'answers')),
+  );
+}
 
 export function renderKnowledge(el: HTMLElement, props: KnowledgeProps): void {
   const { agent, summary } = props;

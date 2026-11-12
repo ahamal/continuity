@@ -66,6 +66,43 @@ export function blockedMoves(agent: Agent, states: readonly State[]): BlockedMov
   return found;
 }
 
+/**
+ * Every case among `states` where the agent expects an action to do nothing,
+ * whichever row that expectation comes from. `blockedMoves` reports only cases
+ * the agent has seen for itself. This also reports the ones it has carried
+ * over from elsewhere, right or wrong.
+ */
+export function expectedStays(agent: Agent, states: readonly State[]): BlockedMove[] {
+  const found: BlockedMove[] = [];
+  for (const action of agent.actions) {
+    // Where the action usually leads: its most common predicted change that is not "none".
+    const tally = new Map<string, { change: number[]; count: number }>();
+    const stays: { state: State; count: number }[] = [];
+    for (const state of states) {
+      const prediction = agent.predict(state, action);
+      if (!prediction) continue;
+      if (sameState(prediction.state, state)) {
+        stays.push({ state, count: prediction.count });
+        continue;
+      }
+      const change = prediction.state.map((value, i) => value - state[i]!);
+      const key = change.join(',');
+      const entry = tally.get(key) ?? { change, count: 0 };
+      entry.count += 1;
+      tally.set(key, entry);
+    }
+    let usual: number[] | null = null;
+    let most = 0;
+    for (const { change, count } of tally.values()) {
+      if (count > most) [usual, most] = [change, count];
+    }
+    for (const { state, count } of stays) {
+      found.push({ state, action, count, wouldBe: usual && state.map((value, i) => value + usual![i]!) });
+    }
+  }
+  return found;
+}
+
 /** One question put to the knowledge base, and how it was answered. */
 export interface Lookup {
   action: Action;
