@@ -499,17 +499,17 @@ code {
 */
 
 :root {
-  --bench: #e6e3d8;
-  --panel: #fbfaf6;
-  --line: #d6d2c5;
-  --radius: 10px;
-  --shadow: 0 1px 2px rgb(21 23 26 / 6%), 0 4px 14px rgb(21 23 26 / 5%);
+  --bench: #ece9df;
+  --panel: #f6f4ed;
+  --line: #dad6ca;
+  --radius: 4px;
+  --shadow: 0 1px 2px rgb(21 23 26 / 4%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bench: #0a0c0e;
-    --panel: #15181c;
+    --bench: #0c0e11;
+    --panel: #121519;
     --line: #2b2f36;
     --shadow: 0 1px 2px rgb(0 0 0 / 40%);
   }
@@ -588,7 +588,7 @@ body[data-layout='lab'] .pager {
   height: 32px;
   padding: 0 8px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 3px;
   background: var(--panel);
   color: var(--ink);
   font: 13px var(--mono);
@@ -699,7 +699,7 @@ body[data-layout='lab'] .pager {
 .count {
   margin-left: 4px;
   padding: 1px 6px;
-  border-radius: 99px;
+  border-radius: 3px;
   background: var(--bench);
   color: var(--ink-2);
   font: 500 11px var(--mono);
@@ -714,7 +714,7 @@ body[data-layout='lab'] .pager {
   gap: 6px;
   height: 28px;
   padding: 0 12px 0 9px;
-  border-radius: 99px;
+  border-radius: 3px;
   background: var(--bench);
   color: var(--ink);
   font: 600 13.5px var(--sans);
@@ -737,7 +737,7 @@ body[data-layout='lab'] .pager {
 }
 
 .pill-solid {
-  background: var(--ink);
+  background: var(--ink-2);
   color: var(--paper);
 }
 
@@ -751,7 +751,7 @@ body[data-layout='lab'] .pager {
   height: 34px;
   padding: 0 13px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 3px;
   background: var(--panel);
   color: var(--ink);
   font: 500 13px var(--sans);
@@ -801,7 +801,7 @@ body[data-layout='lab'] .pager {
   height: 42px;
   padding: 0;
   border-color: var(--ink);
-  border-radius: 50%;
+  border-radius: 3px;
   background: var(--ink);
   color: var(--paper);
 }
@@ -826,7 +826,7 @@ body[data-layout='lab'] .pager {
   flex: none;
   padding: 0 7px;
   border: 0;
-  border-radius: 99px;
+  border-radius: 3px;
   background: var(--bench);
   color: var(--ink-2);
   font: 11.5px/1.7 var(--mono);
@@ -841,7 +841,7 @@ body[data-layout='lab'] .pager {
 .segmented {
   display: inline-flex;
   padding: 3px;
-  border-radius: 9px;
+  border-radius: 3px;
   background: var(--bench);
 }
 
@@ -853,7 +853,7 @@ body[data-layout='lab'] .pager {
   height: 28px;
   padding: 0 12px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 3px;
   background: none;
   color: var(--ink-2);
   font: 500 13px var(--sans);
@@ -862,7 +862,7 @@ body[data-layout='lab'] .pager {
 
 .segmented button.is-on {
   background: var(--panel);
-  box-shadow: 0 1px 2px rgb(21 23 26 / 14%);
+  box-shadow: 0 1px 1px rgb(21 23 26 / 8%);
   color: var(--ink);
 }
 
@@ -1073,14 +1073,14 @@ body[data-layout='lab'] .pager {
   margin: 0;
   padding: 8px 14px;
   border-top: 1px solid var(--line);
-  border-radius: 0 0 var(--radius) var(--radius);
+  border-radius: 0 0 3px 3px;
   background: color-mix(in srgb, var(--bench) 45%, var(--panel));
 }
 
 .move-n {
   min-width: 26px;
   padding: 0 7px;
-  border-radius: 99px;
+  border-radius: 3px;
   background: var(--ink);
   color: var(--paper);
   font: 600 11.5px/1.7 var(--mono);
@@ -1099,7 +1099,7 @@ body[data-layout='lab'] .pager {
   align-items: center;
   gap: 4px;
   padding: 1px 7px;
-  border-radius: 6px;
+  border-radius: 3px;
   font-weight: 600;
 }
 
@@ -1164,7 +1164,7 @@ body[data-layout='lab'] .pager {
   flex: 1;
   min-width: 0;
   height: 30px;
-  border-radius: 6px;
+  border-radius: 3px;
   background: var(--bench);
   cursor: ew-resize;
   touch-action: none;
@@ -1246,7 +1246,7 @@ body[data-layout='lab'] .pager {
 .actions tr.is-latest .action {
   margin-left: -7px;
   padding: 1px 7px;
-  border-radius: 6px;
+  border-radius: 3px;
   background: var(--bench);
 }
 
@@ -1259,7 +1259,7 @@ body[data-layout='lab'] .pager {
 .squares i {
   width: 12px;
   height: 12px;
-  border-radius: 3px;
+  border-radius: 1px;
   background: var(--bench);
   transition: background 0.2s;
 }
@@ -1293,7 +1293,7 @@ body[data-layout='lab'] .pager {
   width: 120px;
   height: 8px;
   overflow: hidden;
-  border-radius: 99px;
+  border-radius: 3px;
   background: var(--bench);
 }
 
@@ -1301,7 +1301,7 @@ body[data-layout='lab'] .pager {
   display: block;
   min-width: 2px;
   height: 100%;
-  border-radius: 99px;
+  border-radius: 3px;
   background: var(--ink);
   transition: width 0.2s;
 }
@@ -1328,7 +1328,7 @@ body[data-layout='lab'] .pager {
   gap: 9px;
   margin: 0 -8px;
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: 3px;
   font: 12.5px/1.5 var(--mono);
 }
 
