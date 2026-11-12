@@ -129,5 +129,4 @@ chess.
 
 ## Git
 
-Part 1 is on `main`, pushed to `origin`. The branch `part-1-pages` is at the same commit and
-is where the work was done. Check `git status` and `git log` before starting.
+Part 1 is on `main`, pushed to `origin`. Check `git status` and `git log` before starting.
