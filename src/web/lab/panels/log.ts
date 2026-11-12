@@ -1,3 +1,5 @@
+// State side: every event of the run as a list. Click a line to go there.
+
 import type { RunEvent } from '../../../runs/events';
 import { cx, h } from '../dom';
 import { formatPath, formatState, plural } from '../words';

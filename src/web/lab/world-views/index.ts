@@ -1,3 +1,6 @@
+// World drawings. Each kind of world registers its own drawing here, so a
+// board game can be added without touching the rest of the lab.
+
 import type { State } from '../../../core/state';
 import type { Run } from '../../../runs/run';
 import type { Summary } from '../../../runs/summary';

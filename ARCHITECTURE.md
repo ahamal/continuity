@@ -64,13 +64,16 @@ it up to any point. The site's step-back and timeline rely on this.
 | `controller.ts` | Holds the run and the position in it. No drawing. |
 | `lab.ts` | Arranges the regions and passes each what to show |
 | `world-views/` | One drawing per kind of world. A board game adds its own here. |
-| `panels/` | One file per region: mode, learning, timeline, knowledge, log, cell card |
+| `panels/` | One file per region: mode, learning, timeline, knowledge, log, selected cell |
 | `words.ts` | Every piece of text made from engine data |
 
 ### What the viewer must keep true
 
+- Two sides. Left is the state: what is happening. Right is the knowledge: what the agent has
+  learned. A region belongs to one side.
+- Every region has a fixed place. No popups.
 - It always says what the agent is doing and what is driving it: curiosity or a goal.
 - It always shows how much the agent knows, and how much of that it has tried itself.
 - One colour each for curiosity, goal and surprise, used the same way in every region.
-- An action sits where you are already looking. A cell's actions are at the cell.
+- An action sits where you are already looking. A cell's actions are directly under the world.
 - Anything shown can be traced: a prediction to its entries, an entry to the move that made it.

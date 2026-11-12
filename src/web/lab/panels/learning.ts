@@ -1,3 +1,6 @@
+// Knowledge side: how much the agent knows. Confidence and curiosity per
+// action, its general rules, and how many moves it has tried itself.
+
 import type { Agent } from '../../../agents/agent';
 import { factsKey } from '../../../core/facts';
 import type { Summary } from '../../../runs/summary';

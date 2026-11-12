@@ -703,14 +703,31 @@ body[data-layout='lab'] .pager {
 
 /* ---- what it is doing ------------------------------------------------- */
 
+.side-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  padding: 7px var(--gutter);
+  border-bottom: 1px solid var(--ink);
+  background: var(--paper-2);
+  font: 600 13px var(--cond);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.side-title span {
+  color: var(--ink-2);
+  font: 400 12.5px var(--sans);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .mode {
   --drive: var(--ink-3);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0 28px;
-  min-height: 132px;
-  padding: 10px var(--gutter) 12px;
-  border-bottom: 1px solid var(--ink);
+  min-height: 100px;
+  padding: 7px var(--gutter) 9px;
+  border-bottom: 1px solid var(--rule);
   border-left: 6px solid var(--drive);
   background: color-mix(in srgb, var(--drive) 7%, var(--paper));
 }
@@ -724,9 +741,9 @@ body[data-layout='lab'] .pager {
 }
 
 .mode-title {
-  margin: 1px 0 3px;
+  margin: 0 0 2px;
   color: var(--ink);
-  font: 600 24px/1.15 var(--cond);
+  font: 600 22px/1.15 var(--cond);
   letter-spacing: 0.01em;
 }
 
@@ -758,9 +775,24 @@ body[data-layout='lab'] .pager {
   color: var(--ink-2);
 }
 
-.mode-why {
-  padding-left: 20px;
-  border-left: 1px solid var(--rule);
+.state-body {
+  height: 96px;
+  padding: 6px var(--gutter) 8px;
+  overflow-y: auto;
+}
+
+.selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  min-height: 44px;
+  padding: 5px var(--gutter);
+  border-top: 1px solid var(--rule);
+}
+
+.selection .btn-goal {
+  padding: 5px 12px;
 }
 
 .why-line {
@@ -842,14 +874,23 @@ body[data-layout='lab'] .pager {
 }
 
 .world-wrap {
-  position: relative;
+  display: flex;
   flex: 1;
+  gap: 12px;
   min-height: 150px;
+  padding: 8px var(--gutter) 4px;
 }
 
+/* The drawing takes whatever room is left and never sets the height itself. */
 .world {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.world .grid-view {
   position: absolute;
-  inset: 8px var(--gutter) 2px;
+  inset: 0;
 }
 
 /* ---- the world drawing ------------------------------------------------ */
@@ -979,48 +1020,24 @@ body[data-layout='lab'] .pager {
   fill: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
-/* ---- the card beside a cell ------------------------------------------- */
+/* ---- what it expects at the selected cell ----------------------------- */
 
-.cell-card {
-  position: absolute;
-  z-index: 5;
-  width: 318px;
-  padding: 10px 12px 12px;
-  border: 1.5px solid var(--ink);
-  background: var(--paper);
-  box-shadow: 4px 4px 0 color-mix(in srgb, var(--ink) 18%, transparent);
+.cell-beliefs {
+  padding: 10px var(--gutter) 10px;
+  border-bottom: 1px solid var(--ink);
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
 }
 
-.card-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.card-head strong {
-  font-size: 15px;
-}
-
-.card-close {
-  margin-left: auto;
-  padding: 0 4px;
-  border: 0;
-  background: none;
-  color: var(--ink-2);
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.card-send {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.card-note {
-  margin: 0;
+.cell-note {
+  margin: 4px 0 0;
   line-height: 1.45;
+}
+
+.belief-curiosity {
+  color: var(--ink-3);
+  font: 12px var(--mono);
+  text-align: right !important;
+  white-space: nowrap;
 }
 
 .beliefs {
@@ -1038,12 +1055,12 @@ body[data-layout='lab'] .pager {
 }
 
 .beliefs th {
-  width: 52px;
+  width: 60px;
   font: 500 12.5px var(--mono);
 }
 
 .belief-expects {
-  width: 92px;
+  width: 110px;
   font: 12.5px var(--mono);
 }
 
@@ -1061,9 +1078,11 @@ body[data-layout='lab'] .pager {
 
 .legend {
   display: flex;
-  flex-wrap: wrap;
-  gap: 3px 16px;
-  padding: 2px var(--gutter) 8px;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  width: 168px;
   color: var(--ink-2);
   font-size: 12px;
 }
@@ -1344,13 +1363,6 @@ body[data-layout='lab'] .pager {
   margin: 6px 0 0;
   color: var(--ink-2);
   line-height: 1.45;
-}
-
-.past-note {
-  flex-basis: 100%;
-  margin: 0;
-  color: var(--ink-2);
-  font-size: 12.5px;
 }
 
 .transport-where strong {
@@ -1680,16 +1692,8 @@ body[data-layout='lab'] .pager {
     justify-self: start;
   }
 
-  .mode,
   .lab-main {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .mode-why {
-    margin-top: 10px;
-    padding: 8px 0 0;
-    border-top: 1px solid var(--rule);
-    border-left: 0;
   }
 
   .stage {
@@ -1697,8 +1701,15 @@ body[data-layout='lab'] .pager {
   }
 
   .world-wrap {
-    height: 78vw;
     flex: none;
+    flex-direction: column;
+    height: 100vw;
+  }
+
+  .legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: auto;
   }
 
   .learning {

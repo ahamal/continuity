@@ -1,3 +1,5 @@
+// Knowledge side: every stored entry, grouped, with where each came from.
+
 import type { Agent } from '../../../agents/agent';
 import { type Facts, factCount, factsKey } from '../../../core/facts';
 import type { Entry, Outcome } from '../../../core/knowledge-base';

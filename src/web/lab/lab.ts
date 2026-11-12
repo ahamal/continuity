@@ -1,14 +1,18 @@
+// The lab: arranges the regions of the screen and hands each one what to show.
+// Left side is the state (what is happening). Right side is the knowledge
+// (what the agent has learned). Each region is drawn by its own file in panels/.
+
 import type { Recipe } from '../../agents/recipes';
 import { type State, sameState } from '../../core/state';
 import { summarise } from '../../runs/summary';
 import { type Scenario, findScenario } from '../../worlds/scenarios';
 import { Controller } from './controller';
 import { cx, h, put } from './dom';
-import { cellCard } from './panels/cell-card';
+import { renderCellBeliefs, renderSelection } from './panels/cell';
 import { exceptionsIn, renderKnowledge } from './panels/knowledge';
 import { renderLearning } from './panels/learning';
 import { renderLog } from './panels/log';
-import { renderMode } from './panels/mode';
+import { renderLastMove, renderMode } from './panels/mode';
 import { createTimeline } from './panels/timeline';
 import { type WorldView, createWorldView } from './world-views';
 
@@ -19,7 +23,8 @@ export interface LabOptions {
   notesHtml?: string;
 }
 
-type Tab = 'knowledge' | 'log' | 'notes';
+type Tab = 'knowledge' | 'notes';
+type StateTab = 'move' | 'log';
 
 const SPEEDS: [label: string, perSecond: number][] = [
   ['Slow', 2],
@@ -39,25 +44,29 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
 
   let selected: State | null = null;
   let tab: Tab = 'knowledge';
+  let stateTab: StateTab = 'move';
   let view: WorldView;
 
-  // Regions, in the order you meet them: set-up, what it is doing, the world
-  // and time on the left, what it knows on the right.
+  // Two sides. Left is the state: what is happening. Right is the knowledge:
+  // what the agent has learned. Every region has a fixed place.
   const setupEl = h('div', { class: 'setup' });
   const modeEl = h('section', { class: 'mode', 'aria-live': 'polite' });
   const worldEl = h('div', { class: 'world' });
-  const cardEl = h('div', { class: 'card-slot' });
+  const selectionEl = h('div', { class: 'selection' });
   const legendEl = h('div', { class: 'legend' },
     legendItem('lg-agent', 'the agent'),
     legendItem('lg-visited', 'been here'),
-    legendItem('lg-unvisited', 'never been here: only predicted'),
-    legendItem('lg-blocked', 'learned: this move does nothing'),
-    legendItem('lg-route', 'the plan it is following'),
+    legendItem('lg-unvisited', 'never been here'),
+    legendItem('lg-blocked', 'learned: move does nothing'),
+    legendItem('lg-route', 'its plan'),
     legendItem('lg-surprise', 'surprise'),
   );
+  const stateTabsEl = h('div', { class: 'tabs', role: 'tablist' });
+  const stateBodyEl = h('div', { class: 'state-body' });
   const transportEl = h('div', { class: 'transport' });
   const timelineEl = h('div', { class: 'timeline' });
   const learningEl = h('section', { class: 'learning' });
+  const beliefsEl = h('section', { class: 'cell-beliefs' });
   const tabsEl = h('div', { class: 'tabs', role: 'tablist' });
   const tabBodyEl = h('div', { class: 'tab-body' });
 
@@ -69,15 +78,24 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
 
   const lab = h('div', { class: 'lab' },
     setupEl,
-    modeEl,
     h('div', { class: 'lab-main' },
       h('div', { class: 'stage' },
-        h('div', { class: 'world-wrap', onClick: () => select(null) }, worldEl, cardEl),
-        legendEl,
+        h('h2', { class: 'side-title' }, 'State', h('span', null, 'what is happening')),
+        modeEl,
+        h('div', { class: 'world-wrap', onClick: () => select(null) }, worldEl, legendEl),
+        selectionEl,
+        stateTabsEl,
+        stateBodyEl,
         transportEl,
         timelineEl,
       ),
-      h('div', { class: 'side' }, learningEl, tabsEl, tabBodyEl),
+      h('div', { class: 'side' },
+        h('h2', { class: 'side-title' }, 'Knowledge', h('span', null, 'what it has learned')),
+        learningEl,
+        beliefsEl,
+        tabsEl,
+        tabBodyEl,
+      ),
     ),
   );
   container.replaceChildren(lab);
@@ -147,7 +165,9 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
         h('button', { class: 'btn', title: 'One move forward (→)', disabled: atEnd, onClick: stop(() => controller.forward()) }, 'Step ▶'),
         h('button', { class: 'btn', title: 'Jump to the latest move', disabled: atEnd, onClick: stop(() => controller.seek(Infinity)) }, '⏭'),
       ),
-      h('p', { class: 'transport-where' }, h('strong', null, moves === 0 ? 'No moves yet' : `Move ${shown} of ${moves}`)),
+      h('p', { class: 'transport-where' },
+        h('strong', null, moves === 0 ? 'No moves yet' : `Move ${shown} of ${moves}`),
+        !atEnd && !playing && moves > 0 && h('span', { class: 'muted', title: 'A new command from here replaces what came after.' }, ' · looking at the past')),
       h('div', { class: 'segmented segmented-small', 'aria-label': 'Speed' },
         ...SPEEDS.map(([label, speed]) =>
           h('button', {
@@ -158,58 +178,20 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
             },
           }, label)),
       ),
-      !atEnd && !playing && moves > 0 &&
-        h('p', { class: 'past-note' }, 'You are looking at the past. A new command from here replaces what came after.'),
     );
   }
 
-  function renderTabs(entries: number): void {
-    const names: [Tab, string][] = [
-      ['knowledge', `Everything it has stored (${entries})`],
-      ['log', 'What happened'],
-    ];
-    if (options.notesHtml) names.push(['notes', 'Notes']);
-    tabsEl.replaceChildren(
+  function tabButtons<T extends string>(el: HTMLElement, names: [T, string][], current: T, choose: (id: T) => void): void {
+    el.replaceChildren(
       ...names.map(([id, label]) =>
         h('button', {
-          role: 'tab', 'aria-selected': tab === id, class: cx('tab', tab === id && 'is-on'),
+          role: 'tab', 'aria-selected': current === id, class: cx('tab', current === id && 'is-on'),
           onClick: () => {
-            tab = id;
+            choose(id);
             render();
           },
         }, label)),
     );
-  }
-
-  function renderCard(summary: ReturnType<typeof summarise>): void {
-    cardEl.replaceChildren();
-    if (!selected) return;
-    const state = selected;
-    const card = cellCard({
-      state,
-      agent: controller.view.agent,
-      summary,
-      position: controller.view.world.getState(),
-      open: view.isOpen(state),
-      onSend: () => sendTo(state),
-      onClose: () => select(null),
-    });
-    card.addEventListener('click', (event) => event.stopPropagation());
-    cardEl.append(card);
-
-    // Put the card beside the cell, on whichever side has room.
-    const cell = view.rectOf(state);
-    const wrap = cardEl.parentElement!.getBoundingClientRect();
-    if (!cell) return;
-    const width = card.offsetWidth;
-    const height = card.offsetHeight;
-    // The card may reach over the panel on the right. It must not cover the cell.
-    const right = cell.right - wrap.left + 10;
-    const fitsRight = cell.right + 10 + width <= window.innerWidth - 8;
-    const left = fitsRight ? right : cell.left - wrap.left - width - 10;
-    const top = Math.max(0, Math.min(cell.top - wrap.top - 8, wrap.height - height));
-    card.style.left = `${left}px`;
-    card.style.top = `${top}px`;
   }
 
   function render(): void {
@@ -235,12 +217,10 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
       summary,
       position: run.world.getState(),
       suggested: controller.scenario.goals,
-      entries: run.agent.kb.size,
       onExplore: () => controller.command({ type: 'explore' }),
       onGoal: sendTo,
     });
     view.update({ run, summary, selected, suggested: controller.scenario.goals });
-    renderCard(summary);
     renderTransport(moves, summary.steps.length);
     timeline.update({ events: controller.head.events, cursor: controller.cursor, stops });
     renderLearning(learningEl, {
@@ -249,14 +229,28 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
       possibleMoves: view.states().length * run.agent.actions.length,
       exceptions,
     });
-    renderTabs(run.agent.kb.size);
+    const cell = {
+      state: selected,
+      agent: run.agent,
+      summary,
+      position: run.world.getState(),
+      open: selected ? view.isOpen(selected) : false,
+      onSend: () => selected && sendTo(selected),
+      onClear: () => select(null),
+    };
+    renderSelection(selectionEl, cell);
+    renderCellBeliefs(beliefsEl, cell);
 
+    tabButtons<StateTab>(stateTabsEl, [['move', 'Its last move'], ['log', `Everything that happened (${moves} moves)`]], stateTab, (id) => (stateTab = id));
+    if (stateTab === 'move') renderLastMove(stateBodyEl, summary);
+    else renderLog(stateBodyEl, { events: controller.head.events, cursor: controller.cursor, stops, onSeek: seek });
+
+    const names: [Tab, string][] = [['knowledge', `Everything it has stored (${run.agent.kb.size} entries)`]];
+    if (options.notesHtml) names.push(['notes', 'Notes on this stage']);
+    tabButtons<Tab>(tabsEl, names, tab, (id) => (tab = id));
     if (tab === 'knowledge') {
       tabBodyEl.className = 'tab-body';
       renderKnowledge(tabBodyEl, { agent: run.agent, summary, onShowMove: (move) => seek(afterMove(move)) });
-    } else if (tab === 'log') {
-      tabBodyEl.className = 'tab-body';
-      renderLog(tabBodyEl, { events: controller.head.events, cursor: controller.cursor, stops, onSeek: seek });
     } else {
       tabBodyEl.className = 'tab-body notes';
       tabBodyEl.innerHTML = options.notesHtml ?? '';

@@ -1,3 +1,5 @@
+// State side: the run over time. One tick per move. Drag to move through it.
+
 import type { RunEvent, StepEvent } from '../../../runs/events';
 import { cx, h, s } from '../dom';
 

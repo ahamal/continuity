@@ -1,3 +1,5 @@
+// The drawing for grid worlds (the line and the 2D grid).
+
 import { blockedMoves } from '../../../agents/inspect';
 import { type State, sameState, stateKey } from '../../../core/state';
 import { type GridWorld, openStates } from '../../../worlds/world';

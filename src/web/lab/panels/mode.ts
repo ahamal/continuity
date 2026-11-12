@@ -1,3 +1,6 @@
+// State side: what the agent is doing and what drives it, the commands that
+// make sense now, and the explanation of its last move.
+
 import { type State, sameState } from '../../../core/state';
 import type { StepEvent } from '../../../runs/events';
 import type { Summary } from '../../../runs/summary';
@@ -8,14 +11,13 @@ export interface ModeProps {
   summary: Summary;
   position: State;
   suggested: readonly State[];
-  entries: number;
   onExplore(): void;
   onGoal(goal: State): void;
 }
 
 /**
- * The band across the top: what the agent is doing, what is driving it, why
- * it made its last move, and what you can ask of it next.
+ * What the agent is doing, what is driving it, and what you can ask of it
+ * next.
  */
 export function renderMode(el: HTMLElement, props: ModeProps): void {
   const { summary } = props;
@@ -75,22 +77,21 @@ export function renderMode(el: HTMLElement, props: ModeProps): void {
         h('button', { class: 'btn btn-goal', onClick: () => props.onGoal(goal) }, `Send it to ${formatState(goal)}`),
       );
     }
-    actions.append(h('span', { class: 'mode-hint' }, 'or click any cell'));
+    actions.append(h('span', { class: 'mode-hint' }, 'or click any cell below'));
   }
 
   el.className = cx('mode', `mode-${drive}`);
   el.replaceChildren(
-    h('div', { class: 'mode-main' },
-      h('p', { class: 'label' }, 'What it is doing'),
-      h('h2', { class: 'mode-title' }, title),
-      h('p', { class: 'mode-sentence' }, sentence),
-      actions,
-    ),
-    h('div', { class: 'mode-why' },
-      h('p', { class: 'label' }, 'Its last move'),
-      ...lastMove(summary.lastStep, summary.steps.length),
-    ),
+    h('p', { class: 'label' }, 'What it is doing'),
+    h('h2', { class: 'mode-title' }, title),
+    h('p', { class: 'mode-sentence' }, sentence),
+    actions,
   );
+}
+
+/** Why the agent made its last move, and how it turned out. */
+export function renderLastMove(el: HTMLElement, summary: Summary): void {
+  el.replaceChildren(...lastMove(summary.lastStep, summary.steps.length));
 }
 
 function lastMove(step: StepEvent | null, number: number): (HTMLElement | string)[] {

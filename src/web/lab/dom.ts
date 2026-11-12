@@ -1,3 +1,5 @@
+// Small helpers for building page elements. Nothing here knows about the agent.
+
 type Child = Node | string | number | null | undefined | false;
 type Props = Record<string, unknown>;
 

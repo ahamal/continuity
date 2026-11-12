@@ -1,3 +1,5 @@
+// The run and the position in it. No drawing happens here.
+
 import type { Recipe } from '../../agents/recipes';
 import { type Command, Run, type RunConfig, advanceTo, replay } from '../../runs/run';
 import type { Scenario } from '../../worlds/scenarios';
