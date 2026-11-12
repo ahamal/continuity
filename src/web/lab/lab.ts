@@ -1,30 +1,28 @@
 // The lab: arranges the regions of the screen and hands each one what to show.
-// Left side is the state (what is happening). Right side is the knowledge
-// (what the agent has learned). Each region is drawn by its own file in panels/.
+//
+// Two sides. Left is the state: what is happening. Right is the knowledge:
+// what the agent has learned. Each fact is shown once, in one fixed place.
+// Each region is drawn by its own file in panels/ or world-views/.
 
 import type { Recipe } from '../../agents/recipes';
-import { type State, sameState } from '../../core/state';
+import { type State, formatState, sameState } from '../../core/state';
 import { summarise } from '../../runs/summary';
 import { type Scenario, findScenario } from '../../worlds/scenarios';
 import { Controller } from './controller';
 import { cx, h, put } from './dom';
-import { renderCellBeliefs, renderSelection } from './panels/cell';
-import { exceptionsIn, renderKnowledge } from './panels/knowledge';
-import { renderLearning } from './panels/learning';
-import { renderLog } from './panels/log';
-import { renderLastMove, renderMode } from './panels/mode';
+import { renderCellBeliefs } from './panels/cell';
+import { renderKnowledge } from './panels/knowledge';
+import { renderLearning, renderLevel } from './panels/learning';
+import { renderActivity, renderLastMove } from './panels/state';
 import { createTimeline } from './panels/timeline';
 import { type WorldView, createWorldView } from './world-views';
 
 export interface LabOptions {
   recipe: Recipe;
   scenarioIds: string[];
-  /** Notes about the stage, shown in their own tab. */
-  notesHtml?: string;
+  /** Where the world picker, seed and "Start over" go. Usually the page header. */
+  setupSlot?: HTMLElement | null;
 }
-
-type Tab = 'knowledge' | 'notes';
-type StateTab = 'move' | 'log';
 
 const SPEEDS: [label: string, perSecond: number][] = [
   ['Slow', 2],
@@ -32,142 +30,130 @@ const SPEEDS: [label: string, perSecond: number][] = [
   ['Fast', 20],
 ];
 
-/**
- * The interactive view of one agent in one world. It only arranges the parts
- * and passes them what to show. The run itself lives in the controller, and
- * each region of the screen is drawn by its own module.
- */
 export function createLab(container: HTMLElement, options: LabOptions): () => void {
   const scenarios = options.scenarioIds
     .map((id) => findScenario(id))
     .filter((scenario): scenario is Scenario => scenario !== undefined);
 
   let selected: State | null = null;
-  let tab: Tab = 'knowledge';
-  let stateTab: StateTab = 'move';
   let view: WorldView;
 
-  // Two sides. Left is the state: what is happening. Right is the knowledge:
-  // what the agent has learned. Every region has a fixed place.
-  const setupEl = h('div', { class: 'setup' });
-  const modeEl = h('section', { class: 'mode', 'aria-live': 'polite' });
-  const worldEl = h('div', { class: 'world' });
-  const selectionEl = h('div', { class: 'selection' });
-  const legendEl = h('div', { class: 'legend' },
-    legendItem('lg-agent', 'the agent'),
-    legendItem('lg-visited', 'been here'),
-    legendItem('lg-unvisited', 'never been here'),
-    legendItem('lg-blocked', 'learned: move does nothing'),
-    legendItem('lg-route', 'its plan'),
-    legendItem('lg-surprise', 'surprise'),
-  );
-  const stateTabsEl = h('div', { class: 'tabs', role: 'tablist' });
-  const stateBodyEl = h('div', { class: 'state-body' });
-  const transportEl = h('div', { class: 'transport' });
+  // State side.
+  const activityEl = h('p', { class: 'headline', 'aria-live': 'polite' });
+  const worldEl = h('div', { class: 'world', onClick: () => select(null) });
+  const lastMoveEl = h('p', { class: 'last-move' });
+  const controlsEl = h('div', { class: 'controls' });
   const timelineEl = h('div', { class: 'timeline' });
-  const learningEl = h('section', { class: 'learning' });
-  const beliefsEl = h('section', { class: 'cell-beliefs' });
-  const tabsEl = h('div', { class: 'tabs', role: 'tablist' });
-  const tabBodyEl = h('div', { class: 'tab-body' });
+  // Knowledge side.
+  const levelEl = h('p', { class: 'headline' });
+  const learningEl = h('section', { class: 'block' });
+  const cellEl = h('section', { class: 'block' });
+  const knowledgeEl = h('section', { class: 'block block-fill' });
+  // Set-up: chosen before a run, so it sits apart from both sides.
+  const setupEl = options.setupSlot ?? h('div', { class: 'setup' });
 
   const controller = new Controller(options.recipe, scenarios[0]!, 1, () => render());
-  const timeline = createTimeline(timelineEl, (position) => {
+  const seek = (position: number) => {
     controller.pause(false);
     controller.seek(position);
-  });
+  };
+  const timeline = createTimeline(timelineEl, seek);
 
-  const lab = h('div', { class: 'lab' },
-    setupEl,
-    h('div', { class: 'lab-main' },
-      h('div', { class: 'stage' },
-        h('h2', { class: 'side-title' }, 'State', h('span', null, 'what is happening')),
-        modeEl,
-        h('div', { class: 'world-wrap', onClick: () => select(null) }, worldEl, legendEl),
-        selectionEl,
-        stateTabsEl,
-        stateBodyEl,
-        transportEl,
+  container.replaceChildren(
+    h('div', { class: 'lab' },
+      !options.setupSlot && setupEl,
+      h('section', { class: 'side side-state' },
+        h('p', { class: 'side-name' }, 'State'),
+        activityEl,
+        worldEl,
+        h('p', { class: 'legend' },
+          h('i', { class: 'lg lg-visited' }), 'been here',
+          h('i', { class: 'lg lg-blocked' }), 'learned: no way through',
+          h('i', { class: 'lg lg-route' }), 'plan',
+          h('i', { class: 'lg lg-surprise' }), 'surprise'),
+        lastMoveEl,
+        controlsEl,
         timelineEl,
       ),
-      h('div', { class: 'side' },
-        h('h2', { class: 'side-title' }, 'Knowledge', h('span', null, 'what it has learned')),
+      h('section', { class: 'side side-knowledge' },
+        h('p', { class: 'side-name' }, 'Knowledge'),
+        levelEl,
         learningEl,
-        beliefsEl,
-        tabsEl,
-        tabBodyEl,
+        cellEl,
+        knowledgeEl,
       ),
     ),
   );
-  container.replaceChildren(lab);
 
   function select(state: State | null): void {
     selected = state && selected && sameState(state, selected) ? null : state;
     render();
   }
 
-  function mountWorld(): void {
-    view = createWorldView(controller.view.world, select);
-    worldEl.replaceChildren(view.el);
-  }
-
   function newRun(scenario = controller.scenario, seed = controller.seed): void {
     selected = null;
     controller.reset(scenario, seed);
-    mountWorld();
+    view = createWorldView(controller.view.world, select);
+    worldEl.replaceChildren(view.el);
     render();
   }
 
-  function sendTo(goal: State): void {
-    selected = null;
-    controller.command({ type: 'goal', goal });
-  }
-
   function renderSetup(): void {
-    const seed = h('input', {
-      class: 'seed', type: 'number', min: 1, value: controller.seed, 'aria-label': 'Seed',
-      onChange: (event: Event) => {
-        const value = Math.max(1, Math.floor(Number((event.target as HTMLInputElement).value)) || 1);
-        newRun(controller.scenario, value);
-      },
-    });
     put(setupEl,
       scenarios.length > 1 &&
-        h('div', { class: 'setup-group' },
-          h('span', { class: 'label' }, 'World'),
-          h('div', { class: 'segmented' },
-            ...scenarios.map((scenario) =>
-              h('button', {
-                class: cx(scenario === controller.scenario && 'is-on'),
-                'aria-pressed': scenario === controller.scenario,
-                onClick: () => newRun(scenario),
-              }, scenario.label)),
-          ),
+        h('div', { class: 'segmented' },
+          ...scenarios.map((scenario) =>
+            h('button', {
+              class: cx(scenario === controller.scenario && 'is-on'),
+              'aria-pressed': scenario === controller.scenario,
+              onClick: () => newRun(scenario),
+            }, scenario.label)),
         ),
-      h('p', { class: 'setup-note' }, controller.scenario.description),
-      h('div', { class: 'setup-group setup-right' },
-        h('label', { class: 'label', title: 'The seed fixes the random choices, so a run can be repeated exactly.' }, 'Seed ', seed),
-        h('button', { class: 'btn', onClick: () => newRun() }, 'Start over'),
-      ),
+      h('label', { title: 'The seed fixes the random choices, so a run can be repeated exactly.' },
+        'Seed ',
+        h('input', {
+          class: 'seed', type: 'number', min: 1, value: controller.seed,
+          onChange: (event: Event) => {
+            const value = Math.floor(Number((event.target as HTMLInputElement).value)) || 1;
+            newRun(controller.scenario, Math.max(1, value));
+          },
+        })),
+      h('button', { class: 'btn', onClick: () => newRun() }, 'Start over'),
     );
   }
 
-  function renderTransport(moves: number, shown: number): void {
-    const { atEnd, playing } = controller;
-    const stop = (action: () => void) => () => {
+  /** Every control in one row: what to ask of the agent, then moving through time. */
+  function renderControls(confident: boolean, position: State): void {
+    const { atEnd, playing, cursor } = controller;
+    const paused = (action: () => void) => () => {
       controller.pause(false);
       action();
     };
-    put(transportEl,
-      h('div', { class: 'transport-buttons' },
-        h('button', { class: 'btn', title: 'Back to the start', disabled: controller.cursor === 0, onClick: stop(() => controller.seek(0)) }, '⏮'),
-        h('button', { class: 'btn', title: 'One move back (←)', disabled: controller.cursor === 0, onClick: stop(() => controller.back()) }, '◀ Back'),
-        h('button', { class: 'btn btn-play', title: 'Play or pause (space)', disabled: atEnd, onClick: () => controller.toggle() }, playing ? '❚❚ Pause' : '▶ Play'),
-        h('button', { class: 'btn', title: 'One move forward (→)', disabled: atEnd, onClick: stop(() => controller.forward()) }, 'Step ▶'),
-        h('button', { class: 'btn', title: 'Jump to the latest move', disabled: atEnd, onClick: stop(() => controller.seek(Infinity)) }, '⏭'),
-      ),
-      h('p', { class: 'transport-where' },
-        h('strong', null, moves === 0 ? 'No moves yet' : `Move ${shown} of ${moves}`),
-        !atEnd && !playing && moves > 0 && h('span', { class: 'muted', title: 'A new command from here replaces what came after.' }, ' · looking at the past')),
+    const target = selected && view.isOpen(selected) && !sameState(selected, position) ? selected : null;
+
+    put(controlsEl,
+      h('button', {
+        class: cx('btn', !confident && 'btn-primary'),
+        disabled: confident,
+        title: confident ? 'It is already confident in every action.' : 'Let it act out of curiosity until it is confident.',
+        onClick: () => controller.command({ type: 'explore' }),
+      }, 'Explore'),
+      h('button', {
+        class: cx('btn', target && 'btn-primary'),
+        disabled: !target,
+        title: 'Click a cell, then send the agent there.',
+        onClick: () => {
+          if (!target) return;
+          selected = null;
+          controller.command({ type: 'goal', goal: target });
+        },
+      }, target ? `Send to ${formatState(target)}` : 'Send to a cell'),
+      h('span', { class: 'gap' }),
+      h('button', { class: 'btn', title: 'Back to the start', disabled: cursor === 0, onClick: paused(() => controller.seek(0)) }, '⏮'),
+      h('button', { class: 'btn', title: 'One move back (←)', disabled: cursor === 0, onClick: paused(() => controller.back()) }, '◀'),
+      h('button', { class: 'btn btn-play', title: 'Play or pause (space)', disabled: atEnd, onClick: () => controller.toggle() }, playing ? 'Pause' : 'Play'),
+      h('button', { class: 'btn', title: 'One move forward (→)', disabled: atEnd, onClick: paused(() => controller.forward()) }, '▶'),
+      h('button', { class: 'btn', title: 'Jump to the latest move', disabled: atEnd, onClick: paused(() => controller.seek(Infinity)) }, '⏭'),
       h('div', { class: 'segmented segmented-small', 'aria-label': 'Speed' },
         ...SPEEDS.map(([label, speed]) =>
           h('button', {
@@ -181,30 +167,12 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
     );
   }
 
-  function tabButtons<T extends string>(el: HTMLElement, names: [T, string][], current: T, choose: (id: T) => void): void {
-    el.replaceChildren(
-      ...names.map(([id, label]) =>
-        h('button', {
-          role: 'tab', 'aria-selected': current === id, class: cx('tab', current === id && 'is-on'),
-          onClick: () => {
-            choose(id);
-            render();
-          },
-        }, label)),
-    );
-  }
-
   function render(): void {
     if (!view) return;
     const run = controller.view;
     const summary = summarise(run.events);
-    const moves = controller.head.events.filter((event) => event.type === 'step').length;
-    const exceptions = exceptionsIn(run.agent).length;
+    const position = run.world.getState();
     const stops = controller.stops();
-    const seek = (position: number) => {
-      controller.pause(false);
-      controller.seek(position);
-    };
     /** The position just after move number `move`. */
     const afterMove = (move: number) => {
       let seen = 0;
@@ -213,48 +181,17 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
     };
 
     renderSetup();
-    renderMode(modeEl, {
-      summary,
-      position: run.world.getState(),
-      suggested: controller.scenario.goals,
-      onExplore: () => controller.command({ type: 'explore' }),
-      onGoal: sendTo,
-    });
-    view.update({ run, summary, selected, suggested: controller.scenario.goals });
-    renderTransport(moves, summary.steps.length);
+
+    renderActivity(activityEl, summary, position);
+    view.update({ run, summary, selected });
+    renderLastMove(lastMoveEl, summary);
+    renderControls(run.agent.isConfident(), position);
     timeline.update({ events: controller.head.events, cursor: controller.cursor, stops });
-    renderLearning(learningEl, {
-      agent: run.agent,
-      summary,
-      possibleMoves: view.states().length * run.agent.actions.length,
-      exceptions,
-    });
-    const cell = {
-      state: selected,
-      agent: run.agent,
-      summary,
-      position: run.world.getState(),
-      open: selected ? view.isOpen(selected) : false,
-      onSend: () => selected && sendTo(selected),
-      onClear: () => select(null),
-    };
-    renderSelection(selectionEl, cell);
-    renderCellBeliefs(beliefsEl, cell);
 
-    tabButtons<StateTab>(stateTabsEl, [['move', 'Its last move'], ['log', `Everything that happened (${moves} moves)`]], stateTab, (id) => (stateTab = id));
-    if (stateTab === 'move') renderLastMove(stateBodyEl, summary);
-    else renderLog(stateBodyEl, { events: controller.head.events, cursor: controller.cursor, stops, onSeek: seek });
-
-    const names: [Tab, string][] = [['knowledge', `Everything it has stored (${run.agent.kb.size} entries)`]];
-    if (options.notesHtml) names.push(['notes', 'Notes on this stage']);
-    tabButtons<Tab>(tabsEl, names, tab, (id) => (tab = id));
-    if (tab === 'knowledge') {
-      tabBodyEl.className = 'tab-body';
-      renderKnowledge(tabBodyEl, { agent: run.agent, summary, onShowMove: (move) => seek(afterMove(move)) });
-    } else {
-      tabBodyEl.className = 'tab-body notes';
-      tabBodyEl.innerHTML = options.notesHtml ?? '';
-    }
+    renderLevel(levelEl, run.agent);
+    renderLearning(learningEl, { agent: run.agent, summary, possibleMoves: view.states().length * run.agent.actions.length });
+    renderCellBeliefs(cellEl, { state: selected, agent: run.agent, open: selected ? view.isOpen(selected) : false });
+    renderKnowledge(knowledgeEl, { agent: run.agent, summary, onShowMove: (move) => seek(afterMove(move)) });
   }
 
   function onKey(event: KeyboardEvent): void {
@@ -277,15 +214,10 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   }
   document.addEventListener('keydown', onKey);
 
-  mountWorld();
-  render();
+  newRun();
 
   return () => {
     controller.dispose();
     document.removeEventListener('keydown', onKey);
   };
-}
-
-function legendItem(swatch: string, label: string): HTMLElement {
-  return h('span', { class: 'legend-item' }, h('i', { class: `swatch ${swatch}` }), label);
 }

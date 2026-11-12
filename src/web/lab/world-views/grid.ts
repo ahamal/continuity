@@ -164,11 +164,6 @@ export function createGridView(
 
     marks.replaceChildren();
     const goal = 'goal' in summary.mode ? summary.mode.goal : null;
-    for (const state of scene.suggested) {
-      if (goal && sameState(goal, state)) continue;
-      const [x, y] = centre(state);
-      marks.append(s('circle', { class: 'goal-suggested', cx: x, cy: y, r: 9 }));
-    }
     if (goal) {
       const [x, y] = centre(goal);
       marks.append(

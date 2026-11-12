@@ -1,19 +1,13 @@
 <header class="lab-head">
-  <p class="kicker">Stage 03</p>
-  <h1>1D world</h1>
+  <div>
+    <p class="kicker">Stage 03</p>
+    <h1>1D world</h1>
+  </div>
   <p class="lead">
-    Twelve cells in a row. The agent can move left or right and knows nothing else. Press
-    Start exploring, then send it somewhere.
+    Twelve cells in a row. The agent can move left or right and knows nothing else. Explore,
+    then click a cell and send it there.
   </p>
+  <div class="setup" data-lab-setup></div>
 </header>
 
 <div data-lab></div>
-
-<template data-lab-notes>
-  <ul>
-    <li><strong>Exploring is short.</strong> Two actions, five sightings each. The agent is confident after about ten steps.</li>
-    <li><strong>It predicts where it has never been.</strong> Click a cell it has not visited. What it expects there is assumed from the general rule for each action.</li>
-    <li><strong>It plans by chaining.</strong> The route to a far cell is built from one prediction after another.</li>
-    <li><strong>It keeps learning.</strong> Each step toward a goal adds a specific entry for the cell it passed through.</li>
-  </ul>
-</template>

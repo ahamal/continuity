@@ -13,8 +13,6 @@ export interface Scene {
   run: Run;
   summary: Summary;
   selected: State | null;
-  /** Goals the scenario suggests. */
-  suggested: readonly State[];
 }
 
 /** A drawing of one kind of world. Each kind of world brings its own. */
