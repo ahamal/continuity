@@ -1,0 +1,20 @@
+<header class="lab-head">
+  <p class="kicker">Stage 04</p>
+  <h1>2D world</h1>
+  <p class="lead">
+    A ten by ten grid and four actions. The agent code is the same as in the 1D world. Switch on
+    the walls to see it get surprised and find another way.
+  </p>
+</header>
+
+<div data-lab></div>
+
+<template data-lab-notes>
+  <ul>
+    <li><strong>The same agent works here.</strong> Nothing in it was changed for two dimensions.</li>
+    <li><strong>Walls are found by running into them.</strong> The agent plans straight through a wall it has not met, is surprised, stores what happened and plans again.</li>
+    <li><strong>Each wall cell is learned separately.</strong> The amber brackets show where the agent has learned that an action does nothing. It has no idea of "a wall", only of single blocked moves.</li>
+    <li><strong>Edges are learned the same way.</strong> The agent does not know how big the grid is, so its plans can pass through cells that do not exist. Those steps are drawn outside the frame.</li>
+    <li><strong>It sometimes gives up.</strong> With walls, the agent failed to reach the goal in 133 of 500 runs with different seeds. Its search considers at most 100 cells, and many of those are outside the grid.</li>
+  </ul>
+</template>

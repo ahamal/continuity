@@ -1,0 +1,154 @@
+<article class="prose" style="--stage: '2'">
+  <p class="kicker">Stage 02</p>
+  <h1>Implementation</h1>
+
+  <p class="lead">
+    The agent is a store of what was seen to follow what, plus four operations on it: observe,
+    predict, be curious, and plan. This page describes the version used in stages 3 and 4.
+  </p>
+
+  <h2>Facts</h2>
+  <p>
+    Everything the agent knows is written as named values, called facts. A situation is a set of
+    facts, such as <code>action = right, x = 4, y = 4</code>.
+  </p>
+
+  <h2>The knowledge base</h2>
+  <p>
+    The knowledge base is a flat store. Each entry has a set of input facts and the outcomes that
+    were seen to follow them, each with a count. Nothing is nested.
+  </p>
+  <table class="facts-table">
+    <thead>
+      <tr><th>Inputs</th><th>Outcome</th><th>Seen</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>action = right</code></td><td><code>dx = +1, dy = 0</code></td><td>7</td></tr>
+      <tr><td><code>action = right</code></td><td><code>dx = 0, dy = 0</code></td><td>1</td></tr>
+      <tr><td><code>action = right, x = 4, y = 4</code></td><td><code>new_state = (5, 4)</code></td><td>1</td></tr>
+    </tbody>
+  </table>
+  <p>
+    An entry with fewer inputs applies more widely. That is the hierarchy: it is not a separate
+    structure, only the relation between entries with fewer and more inputs.
+  </p>
+
+  <h2>Observing</h2>
+  <p>
+    One observation is a state, an action and the state that followed. The agent stores it at two
+    levels of generality.
+  </p>
+  <ul>
+    <li><strong>General:</strong> the action alone, followed by the change it caused.</li>
+    <li><strong>Specific:</strong> the whole state and the action, followed by the new state and by the change.</li>
+  </ul>
+  <p>
+    Observing is the same whether the agent made the move or watched it happen. This is what lets
+    one agent learn by watching and by acting.
+  </p>
+
+  <h2>Querying</h2>
+  <p>
+    A query asks for one fact, given what is known. An entry applies when all of its inputs are
+    among the known facts. Of the entries that apply, the one with the most inputs wins, and a
+    tie goes to the outcome seen most often.
+  </p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 196" role="img" aria-label="A query with three known facts checked against three stored entries. The entry with one input applies, the entry with three inputs applies and answers, and an entry for a different action does not apply.">
+      <defs>
+        <marker id="f21-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="f-solid" d="M0,0.5 L8,4 L0,7.5 Z" />
+        </marker>
+      </defs>
+
+      <text class="f-th" x="16" y="20">KNOWN</text>
+      <text class="f-th" x="192" y="20">ENTRY INPUTS</text>
+      <text class="f-th" x="430" y="20">FOLLOWED BY</text>
+      <path class="f-ink" d="M16,28 H624" />
+
+      <text class="f-t" x="16" y="52">action = right</text>
+      <text class="f-t" x="16" y="68">x = 4</text>
+      <text class="f-t" x="16" y="84">y = 4</text>
+      <path class="f-thin" d="M118,42 H126 V90 H118 M126,66 H150 M150,54 V118" />
+      <path class="f-thin" marker-end="url(#f21-arrow)" d="M150,54 H180" />
+      <path class="f-thin" marker-end="url(#f21-arrow)" d="M150,118 H176" />
+      <path class="f-muted f-dash" d="M150,118 V170 H180" />
+
+      <text class="f-t" x="192" y="57">action = right</text>
+      <text class="f-tm" x="192" y="72">1 input, applies</text>
+      <path class="f-muted" marker-end="url(#f21-arrow)" d="M300,54 H420" />
+      <text class="f-t" x="430" y="51">dx = +1, dy = 0  ×7</text>
+      <text class="f-tm" x="430" y="66">dx = 0, dy = 0   ×1</text>
+
+      <path class="f-rule" d="M184,90 H624" />
+
+      <rect class="f-accent-fill" x="182" y="104" width="3" height="36" />
+      <text class="f-t" x="192" y="121">action = right, x = 4, y = 4</text>
+      <text class="f-ta" x="192" y="136">3 inputs: most specific, so it answers</text>
+      <path class="f-accent" marker-end="url(#f21-arrow)" d="M368,118 H420" />
+      <text class="f-t" x="430" y="121">new_state = (5, 4)  ×1</text>
+
+      <path class="f-rule" d="M184,150 H624" />
+
+      <text class="f-tm" x="192" y="173">action = up</text>
+      <path class="f-muted" d="M190,170 H260" />
+      <text class="f-tm" x="192" y="188">does not apply: the action differs</text>
+      <text class="f-tm" x="430" y="173">dx = 0, dy = +1  ×5</text>
+    </svg>
+    <figcaption><b>Fig 2.1</b>Answering "what is the new state?" for one situation. Two entries apply. The one with more inputs wins.</figcaption>
+  </figure>
+
+  <h2>Predicting</h2>
+  <ol>
+    <li>If this exact state and action has been seen, predict the state that followed. One sighting is enough.</li>
+    <li>Otherwise take the change the action most often causes and apply it to the current state.</li>
+  </ol>
+  <p>
+    The second step is why the agent can predict what happens in places it has never been.
+  </p>
+
+  <h2>Curiosity</h2>
+  <ul>
+    <li>Zero if this exact state and action has been seen.</li>
+    <li>Otherwise one divided by the number of times the action has been seen.</li>
+    <li>Zero once the action has been seen five times.</li>
+  </ul>
+  <p>
+    While exploring, the agent takes the action it is most curious about. When nothing nearby is
+    interesting it moves at random. It stops when every action has been seen five times.
+  </p>
+
+  <h2>Planning</h2>
+  <p>
+    To reach a goal the agent searches breadth-first through predicted states, calling predict on
+    the result of the previous prediction. If the search gives up, it falls back to stepping
+    toward the goal greedily.
+  </p>
+
+  <h2>Surprise</h2>
+  <p>
+    While following a plan, the agent compares each result with its prediction. When they differ,
+    the observation it stores becomes a specific entry that overrides the general rule there, and
+    the agent plans again from where it is.
+  </p>
+
+  <h2>What the world provides</h2>
+  <p>
+    The agent sees a world only through a small interface: the list of actions, the current
+    state, the difference between two states, the distance between two states, and names for the
+    parts of a state. This is the built-in part, and stage 5 is about how much of it should stay
+    built in.
+  </p>
+
+  <h2>Where it is in the code</h2>
+  <table class="facts-table">
+    <tbody>
+      <tr><td><code>src/engine/</code></td><td>Facts and the knowledge base</td></tr>
+      <tr><td><code>src/agent/</code></td><td>Observe, predict, curiosity, plan, surprise</td></tr>
+      <tr><td><code>src/worlds/</code></td><td>The line, the grid and the ready-made scenarios</td></tr>
+      <tr><td><code>src/experiments/</code></td><td>Command-line runs</td></tr>
+      <tr><td><code>src/web/</code></td><td>These pages</td></tr>
+    </tbody>
+  </table>
+</article>

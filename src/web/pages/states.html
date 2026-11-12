@@ -1,0 +1,79 @@
+<article class="prose" style="--stage: '5'">
+  <p class="kicker">Stage 05 · in progress</p>
+  <h1>Better representation of states</h1>
+
+  <p class="lead">
+    This is where the work stands. Stages 3 and 4 run, and they show what the current
+    representation cannot express. Nothing on this page is implemented yet.
+  </p>
+
+  <h2>What stages 3 and 4 leave open</h2>
+  <ul>
+    <li>
+      <strong>A state is only raw coordinates.</strong> The agent learns "at (4, 4), right does
+      nothing". It cannot learn "there is a wall at x = 5" or "the edge is at x = 9 for every y".
+    </li>
+    <li>
+      <strong>Only two levels of generality are stored.</strong> One is the action alone, the other
+      is the whole state with the action. The levels between them, such as the action with x
+      alone, are never written.
+    </li>
+    <li>
+      <strong>Storing every level does not scale.</strong> A situation with n facts has 2<sup>n</sup>
+      combinations of them.
+    </li>
+    <li>
+      <strong>The agent does not know the extent of its world.</strong> It plans through cells
+      outside the grid, which is why its search runs out in the walls scenario.
+    </li>
+    <li>
+      <strong>There is one thing in the world.</strong> The agent is the only identity, and it is
+      given. Board games have many things of several kinds, and none of them is the agent.
+    </li>
+    <li>
+      <strong>Stored spread goes unused.</strong> An entry keeps every outcome it has seen with a
+      count, but predictions use only the most frequent one.
+    </li>
+  </ul>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 236" role="img" aria-label="The seven combinations of the facts action, x and y, arranged in three levels by how many facts each has. Only two are stored: action alone, and all three together.">
+      <path class="f-muted" d="M150,45 V111 M150,45 L300,111 M300,45 L150,111 M300,45 L450,111 M450,45 L300,111 M450,45 V111 M150,121 L300,187 M300,121 V187 M450,121 L300,187" />
+
+      <rect class="f-solid" x="145.5" y="35.5" width="9" height="9" />
+      <text class="f-t" x="150" y="27" text-anchor="middle">action</text>
+      <rect class="f-paper f-dash" x="295.5" y="35.5" width="9" height="9" />
+      <text class="f-tm" x="300" y="27" text-anchor="middle">x</text>
+      <rect class="f-paper f-dash" x="445.5" y="35.5" width="9" height="9" />
+      <text class="f-tm" x="450" y="27" text-anchor="middle">y</text>
+
+      <rect class="f-paper f-dash" x="145.5" y="111.5" width="9" height="9" />
+      <text class="f-tm" x="138" y="119" text-anchor="end">action, x</text>
+      <rect class="f-paper f-dash" x="295.5" y="111.5" width="9" height="9" />
+      <text class="f-tm" x="312" y="132">action, y</text>
+      <rect class="f-paper f-dash" x="445.5" y="111.5" width="9" height="9" />
+      <text class="f-tm" x="462" y="119">x, y</text>
+
+      <rect class="f-solid" x="295.5" y="187.5" width="9" height="9" />
+      <text class="f-t" x="300" y="212" text-anchor="middle">action, x, y</text>
+
+      <text class="f-th" x="624" y="43" text-anchor="end">1 FACT: APPLIES WIDELY</text>
+      <text class="f-th" x="624" y="119" text-anchor="end">2 FACTS</text>
+      <text class="f-th" x="624" y="195" text-anchor="end">3 FACTS: EXACTLY HERE</text>
+
+      <rect class="f-solid" x="16" y="221" width="9" height="9" />
+      <text class="f-tm" x="31" y="229">stored today</text>
+      <rect class="f-paper f-dash" x="126" y="221" width="9" height="9" />
+      <text class="f-tm" x="141" y="229">never written</text>
+    </svg>
+    <figcaption><b>Fig 5.1</b>Three facts give seven combinations. The agent stores two. "At x = 9, right does nothing" would live at <i>action, x</i>.</figcaption>
+  </figure>
+
+  <h2>Questions for this stage</h2>
+  <ol>
+    <li>What should a state be made of, so that one representation serves the line, the grid and board games?</li>
+    <li>How do the levels of generality between "always" and "exactly here" come to exist without storing every combination?</li>
+    <li>How do things other than the agent enter the state, and how are they grouped into kinds?</li>
+    <li>How much of what the world provides today should stay built in?</li>
+  </ol>
+</article>

@@ -1,0 +1,255 @@
+<article class="prose" style="--stage: '1'">
+  <p class="kicker">Stage 01</p>
+  <h1>Background theory</h1>
+
+  <p class="lead">
+    The aim is one agent. It is not a language model and it is not trained in advance. It starts
+    with no knowledge of a world, learns how that world works by watching it or by trying things,
+    and then acts in it. The same agent should do this for a line, a grid and many board games,
+    and what it has learned should be readable.
+  </p>
+
+  <h2>Identity</h2>
+  <p>
+    An identity is a label the observer assigns to part of the world: "this is a thing". The world
+    does not hand it over. Physics has atoms, and the observer decides there is a ship.
+  </p>
+  <p>
+    The Ship of Theseus shows this. Replace every plank and ask whether it is the same ship. The
+    question has no answer in the planks, because "ship" was never in them. The paradox is not a
+    problem to solve. It shows how cognition works.
+  </p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 164" role="img" aria-label="Four drawings of a ship over time. More of its parts are replaced in each, until none of the original remains, while one identity spans all four.">
+      <defs>
+        <pattern id="f11-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line class="f-hatch-line" x1="0" y1="0" x2="0" y2="5" />
+        </pattern>
+        <marker id="f11-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="f-solid" d="M0,0.5 L8,4 L0,7.5 Z" />
+        </marker>
+      </defs>
+
+      <text class="f-th" x="24" y="22">IDENTITY: "SHIP"</text>
+      <text class="f-tm" x="614" y="22" text-anchor="end">assigned by the observer, carried across time</text>
+      <path class="f-thin" d="M24,40 V32 H614 V40 M82,32 V40 M240,32 V40 M398,32 V40 M556,32 V40" />
+
+      <!-- t0: all original -->
+      <path class="f-rule f-dash" d="M16,120 H148" />
+      <path class="f-thin" d="M82,104 V50" />
+      <polygon class="f-paper" points="86,56 86,96 118,96" />
+      <polygon class="f-paper" points="78,66 78,96 56,96" />
+      <polygon class="f-paper" points="37,104 24,104 37,115" />
+      <polygon class="f-paper" points="127,104 140,104 127,115" />
+      <rect class="f-paper" x="37" y="104" width="18" height="11" />
+      <rect class="f-paper" x="55" y="104" width="18" height="11" />
+      <rect class="f-paper" x="73" y="104" width="18" height="11" />
+      <rect class="f-paper" x="91" y="104" width="18" height="11" />
+      <rect class="f-paper" x="109" y="104" width="18" height="11" />
+
+      <!-- t1: two planks new -->
+      <path class="f-rule f-dash" d="M174,120 H306" />
+      <path class="f-thin" d="M240,104 V50" />
+      <polygon class="f-paper" points="244,56 244,96 276,96" />
+      <polygon class="f-paper" points="236,66 236,96 214,96" />
+      <polygon class="f-paper" points="195,104 182,104 195,115" />
+      <polygon class="f-paper" points="285,104 298,104 285,115" />
+      <rect class="f-paper" x="195" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="213" y="104" width="18" height="11" />
+      <rect class="f-paper" x="231" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="249" y="104" width="18" height="11" />
+      <rect class="f-paper" x="267" y="104" width="18" height="11" />
+
+      <!-- t2: four planks and a sail new -->
+      <path class="f-rule f-dash" d="M332,120 H464" />
+      <path class="f-thin" d="M398,104 V50" />
+      <polygon class="f-paper" points="402,56 402,96 434,96" />
+      <polygon class="f-thin" style="fill: url(#f11-hatch)" points="394,66 394,96 372,96" />
+      <polygon class="f-paper" points="353,104 340,104 353,115" />
+      <polygon class="f-paper" points="443,104 456,104 443,115" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="353" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="371" y="104" width="18" height="11" />
+      <rect class="f-paper" x="389" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="407" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="425" y="104" width="18" height="11" />
+
+      <!-- t3: every part new -->
+      <path class="f-rule f-dash" d="M490,120 H622" />
+      <path class="f-thin" d="M556,104 V50" />
+      <polygon class="f-thin" style="fill: url(#f11-hatch)" points="560,56 560,96 592,96" />
+      <polygon class="f-thin" style="fill: url(#f11-hatch)" points="552,66 552,96 530,96" />
+      <polygon class="f-thin" style="fill: url(#f11-hatch)" points="511,104 498,104 511,115" />
+      <polygon class="f-thin" style="fill: url(#f11-hatch)" points="601,104 614,104 601,115" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="511" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="529" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="547" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="565" y="104" width="18" height="11" />
+      <rect class="f-thin" style="fill: url(#f11-hatch)" x="583" y="104" width="18" height="11" />
+
+      <path class="f-thin" marker-end="url(#f11-arrow)" d="M150,86 H172" />
+      <path class="f-thin" marker-end="url(#f11-arrow)" d="M308,86 H330" />
+      <path class="f-thin" marker-end="url(#f11-arrow)" d="M466,86 H488" />
+
+      <text class="f-th" x="82" y="140" text-anchor="middle">T0</text>
+      <text class="f-th" x="240" y="140" text-anchor="middle">T1</text>
+      <text class="f-th" x="398" y="140" text-anchor="middle">T2</text>
+      <text class="f-th" x="556" y="140" text-anchor="middle">T3</text>
+      <text class="f-tm" x="82" y="155" text-anchor="middle">all original</text>
+      <text class="f-tm" x="240" y="155" text-anchor="middle">two planks new</text>
+      <text class="f-tm" x="398" y="155" text-anchor="middle">most parts new</text>
+      <text class="f-tm" x="556" y="155" text-anchor="middle">every part new</text>
+    </svg>
+    <figcaption><b>Fig 1.1</b>Hatched parts have been replaced. Nothing in the material stays the same from T0 to T3. The identity does.</figcaption>
+  </figure>
+
+  <h2>Continuity</h2>
+  <p>
+    A continuity is a learned pattern that links states across time: how an identified thing
+    changes from one moment to the next, often in response to an action. Each continuity has two
+    properties.
+  </p>
+  <ul>
+    <li><strong>Generality:</strong> how widely it applies.</li>
+    <li><strong>Strength:</strong> how often it has been observed.</li>
+  </ul>
+
+  <h2>Identity and continuity cannot be separated</h2>
+  <p>
+    Continuity is what tells you whether this is the same item as before. Identity is what a
+    continuity is learned about. Each is needed to derive the other, so they are treated as one
+    mechanism, not two.
+  </p>
+
+  <h2>Hierarchy</h2>
+  <p>
+    Knowledge is organised from general to specific. When both apply, the specific one overrides
+    the general one.
+  </p>
+  <p>
+    Generality runs along more than one direction. A rule can be general or specific about
+    <em>when</em> it applies, and also about <em>who</em> it applies to: every thing, every thing
+    of one kind, or one individual. If all pawns move the same way, "pawn" is a level in the
+    hierarchy. A kind is the set of things that one continuity covers.
+  </p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 250" role="img" aria-label="A chart with two axes. Across: when a rule applies, from always to exactly here. Up: who it applies to, from every thing to one individual. Six example rules are placed on it.">
+      <path class="f-rule f-dash" d="M120,176 H620 M120,116 H620 M120,56 H620 M200,30 V214 M370,30 V214 M540,30 V214" />
+      <path class="f-ink" d="M120,30 V214 H620" />
+
+      <text class="f-th" x="120" y="18">WHO IT APPLIES TO</text>
+      <text class="f-th" x="620" y="246" text-anchor="end">WHEN IT APPLIES</text>
+
+      <text class="f-tm" x="112" y="179" text-anchor="end">every thing</text>
+      <text class="f-tm" x="112" y="119" text-anchor="end">one kind</text>
+      <text class="f-tm" x="112" y="59" text-anchor="end">one individual</text>
+
+      <text class="f-tm" x="200" y="230" text-anchor="middle">always</text>
+      <text class="f-tm" x="370" y="230" text-anchor="middle">in some situation</text>
+      <text class="f-tm" x="540" y="230" text-anchor="middle">exactly here</text>
+
+      <rect class="f-solid" x="196.5" y="172.5" width="7" height="7" />
+      <text class="f-t" x="210" y="179">one change per turn</text>
+
+      <rect class="f-solid" x="196.5" y="112.5" width="7" height="7" />
+      <text class="f-t" x="210" y="119">pawns move forward</text>
+
+      <rect class="f-solid" x="366.5" y="172.5" width="7" height="7" />
+      <text class="f-t" x="380" y="179">nothing enters an occupied cell</text>
+
+      <rect class="f-solid" x="366.5" y="112.5" width="7" height="7" />
+      <text class="f-t" x="380" y="119">a pawn on its first row may move two</text>
+
+      <rect class="f-solid" x="366.5" y="52.5" width="7" height="7" />
+      <text class="f-t" x="360" y="59" text-anchor="end">this rook has moved: no castling</text>
+
+      <rect class="f-accent-fill" x="536.5" y="52.5" width="7" height="7" />
+      <text class="f-ta" x="540" y="44" text-anchor="middle">this pawn, blocked right now</text>
+    </svg>
+    <figcaption><b>Fig 1.2</b>Generality has two directions. Neither "pawns move forward" nor "nothing enters an occupied cell" sits under the other.</figcaption>
+  </figure>
+
+  <h2>Curiosity</h2>
+  <p>
+    Curiosity is the inverse of how complete the agent's knowledge is. It drives the agent to try
+    what it knows least about, it falls as observations accumulate, and below a threshold the
+    agent is confident and stops exploring. When the agent has nothing to watch, curiosity is how
+    it comes to understand a world.
+  </p>
+
+  <h2>Surprise</h2>
+  <p>
+    A surprise is a prediction that turns out wrong. The agent responds by learning a more
+    specific rule for that case and planning again. This is how it adapts to walls, edges and
+    exceptions.
+  </p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 150" role="img" aria-label="A loop: predict, act, compare. If the result is as predicted, the count goes up. If it differs, that is a surprise and the case is stored. Either way the agent plans again from where it is.">
+      <defs>
+        <marker id="f13-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="f-solid" d="M0,0.5 L8,4 L0,7.5 Z" />
+        </marker>
+      </defs>
+
+      <rect class="f-solid" x="24" y="57" width="6" height="6" />
+      <text class="f-t" x="36" y="63">predict</text>
+      <path class="f-thin" marker-end="url(#f13-arrow)" d="M86,60 H118" />
+
+      <rect class="f-solid" x="126" y="57" width="6" height="6" />
+      <text class="f-t" x="138" y="63">act</text>
+      <path class="f-thin" marker-end="url(#f13-arrow)" d="M164,60 H196" />
+
+      <rect class="f-solid" x="204" y="57" width="6" height="6" />
+      <text class="f-t" x="216" y="63">compare</text>
+      <path class="f-thin" d="M266,60 H290 M290,30 V96" />
+      <path class="f-thin" marker-end="url(#f13-arrow)" d="M290,30 H318" />
+      <path class="f-thin" marker-end="url(#f13-arrow)" d="M290,96 H318" />
+
+      <rect class="f-solid" x="326" y="27" width="6" height="6" />
+      <text class="f-t" x="338" y="33">as predicted</text>
+      <path class="f-thin" marker-end="url(#f13-arrow)" d="M418,30 H446" />
+      <rect class="f-solid" x="454" y="27" width="6" height="6" />
+      <text class="f-t" x="466" y="33">count + 1</text>
+
+      <rect class="f-alarm-fill" x="326" y="93" width="6" height="6" />
+      <text class="f-tb" x="338" y="99">differs: surprise</text>
+      <path class="f-thin" marker-end="url(#f13-arrow)" d="M448,96 H476" />
+      <rect class="f-solid" x="484" y="93" width="6" height="6" />
+      <text class="f-t" x="496" y="99">store this case</text>
+
+      <path class="f-thin" d="M528,30 H612 V128 M594,96 H612" />
+      <path class="f-thin" marker-end="url(#f13-arrow)" d="M612,128 H27 V70" />
+      <text class="f-tm" x="320" y="143" text-anchor="middle">plan again from where the agent is</text>
+    </svg>
+    <figcaption><b>Fig 1.3</b>Every step is a prediction that gets checked. A match adds strength. A mismatch adds a more specific rule.</figcaption>
+  </figure>
+
+  <h2>Reasoning as stacked continuity</h2>
+  <p>
+    Reasoning needs continuity. Hold identities stable, chain continuities one after another, and
+    let each step build on the one before. Planning a route is the first example: the agent
+    reaches a conclusion about a place it has never been.
+  </p>
+
+  <h2>Uncertainty is incomplete state</h2>
+  <p>
+    In a deterministic world, if the same situation leads to different outcomes, some part of the
+    state is missing from the agent's representation. Uncertainty is therefore a signal to
+    represent more, not a property of the world.
+  </p>
+
+  <h2>Learning while operating</h2>
+  <p>
+    The agent has no separate training phase. Every observation changes what it knows, including
+    observations made while it is working toward a goal.
+  </p>
+
+  <h2>What is built in</h2>
+  <p>
+    Some structure has to exist before any learning can happen. The framework is itself such
+    structure, and so are a few primitives: distance, direction, cycles, containment and
+    causation. Stating them openly is part of the theory.
+  </p>
+</article>
