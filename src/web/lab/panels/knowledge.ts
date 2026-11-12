@@ -37,7 +37,8 @@ export function exceptionsIn(agent: Agent): Entry[] {
   });
 }
 
-export function renderKnowledge(el: HTMLElement, props: KnowledgeProps): void {
+/** Draws the list and returns how many entries it holds. */
+export function renderKnowledge(el: HTMLElement, props: KnowledgeProps): number {
   const { agent, summary } = props;
   const last = summary.lastStep;
   const used = new Set(last?.expected?.basis ?? []);
@@ -57,7 +58,7 @@ export function renderKnowledge(el: HTMLElement, props: KnowledgeProps): void {
         h('b', null, formatFacts(entry.inputs)),
         ' → ',
         outcomes.map((outcome) => `${formatFacts(outcome.value)} ×${outcome.count}`).join('  ·  ')),
-      origin && h('button', { class: 'link', title: 'Go to the move that created this entry', onClick: () => props.onShowMove(origin.step) }, origin.step),
+      origin && h('button', { class: 'chip', title: 'Go to the move that created this entry', onClick: () => props.onShowMove(origin.step) }, `move ${origin.step}`),
     );
   };
 
@@ -81,4 +82,5 @@ export function renderKnowledge(el: HTMLElement, props: KnowledgeProps): void {
         h('i', { class: 'dot dot-goal dot-surprise' }), 'from a surprise',
         h('span', { class: 'key-used' }, 'used'), 'for the last prediction'),
   );
+  return exceptions.length + exact.length;
 }

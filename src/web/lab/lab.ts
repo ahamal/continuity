@@ -10,6 +10,7 @@ import { summarise } from '../../runs/summary';
 import { type Scenario, findScenario } from '../../worlds/scenarios';
 import { Controller } from './controller';
 import { cx, h, put } from './dom';
+import { icon, icons } from './icons';
 import { renderCellBeliefs } from './panels/cell';
 import { renderKnowledge } from './panels/knowledge';
 import { renderLearning, renderLevel } from './panels/learning';
@@ -39,18 +40,28 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   let view: WorldView;
 
   // State side.
-  const activityEl = h('p', { class: 'headline', 'aria-live': 'polite' });
+  const activityEl = h('span', { class: 'pill', 'aria-live': 'polite' });
   const worldEl = h('div', { class: 'world', onClick: () => select(null) });
   const lastMoveEl = h('p', { class: 'last-move' });
-  const controlsEl = h('div', { class: 'controls' });
+  const controlsEl = h('div', { class: 'toolbar' });
   const timelineEl = h('div', { class: 'timeline' });
+  const speedEl = h('div', { class: 'group' });
   // Knowledge side.
-  const levelEl = h('p', { class: 'headline' });
-  const learningEl = h('section', { class: 'block' });
-  const cellEl = h('section', { class: 'block' });
-  const knowledgeEl = h('section', { class: 'block block-fill' });
+  const levelEl = h('span', { class: 'pill' });
+  const learningEl = h('div', { class: 'panel-body' });
+  const cellNameEl = h('span', { class: 'panel-note' });
+  const cellEl = h('div', { class: 'panel-body' });
+  const entryCountEl = h('span', { class: 'panel-note' });
+  const knowledgeEl = h('div', { class: 'panel-body panel-scroll' });
   // Set-up: chosen before a run, so it sits apart from both sides.
   const setupEl = options.setupSlot ?? h('div', { class: 'setup' });
+
+  /** A titled box. Every region of the lab is one of these. */
+  const panel = (name: string, symbol: Parameters<typeof icon>[0], title: string, aside: HTMLElement | null, ...body: HTMLElement[]) =>
+    h('section', { class: `panel panel-${name}` },
+      h('header', { class: 'panel-head' }, icon(symbol, 16), h('h2', null, title), aside),
+      ...body,
+    );
 
   const controller = new Controller(options.recipe, scenarios[0]!, 1, () => render());
   const seek = (position: number) => {
@@ -62,25 +73,22 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   container.replaceChildren(
     h('div', { class: 'lab' },
       !options.setupSlot && setupEl,
-      h('section', { class: 'side side-state' },
-        h('p', { class: 'side-name' }, 'State'),
-        activityEl,
-        worldEl,
-        h('p', { class: 'legend' },
-          h('i', { class: 'lg lg-visited' }), 'been here',
-          h('i', { class: 'lg lg-blocked' }), 'learned: no way through',
-          h('i', { class: 'lg lg-route' }), 'plan',
-          h('i', { class: 'lg lg-surprise' }), 'surprise'),
-        lastMoveEl,
-        controlsEl,
-        timelineEl,
+      h('div', { class: 'col' },
+        panel('state', icons.state, 'State', activityEl,
+          worldEl,
+          h('p', { class: 'legend' },
+            h('span', null, h('i', { class: 'lg lg-visited' }), 'been here'),
+            h('span', null, h('i', { class: 'lg lg-blocked' }), 'learned: no way through'),
+            h('span', null, h('i', { class: 'lg lg-route' }), 'plan'),
+            h('span', null, h('i', { class: 'lg lg-surprise' }), 'surprise')),
+          lastMoveEl,
+        ),
+        h('section', { class: 'panel panel-controls' }, controlsEl, h('div', { class: 'time-row' }, timelineEl, speedEl)),
       ),
-      h('section', { class: 'side side-knowledge' },
-        h('p', { class: 'side-name' }, 'Knowledge'),
-        levelEl,
-        learningEl,
-        cellEl,
-        knowledgeEl,
+      h('div', { class: 'col' },
+        panel('learning', icons.knowledge, 'Knowledge', levelEl, learningEl),
+        panel('cell', icons.cell, 'Selected cell', cellNameEl, cellEl),
+        panel('entries', icons.entries, 'Stored cases', entryCountEl, knowledgeEl),
       ),
     ),
   );
@@ -109,8 +117,8 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
               onClick: () => newRun(scenario),
             }, scenario.label)),
         ),
-      h('label', { title: 'The seed fixes the random choices, so a run can be repeated exactly.' },
-        'Seed ',
+      h('label', { class: 'field', title: 'The seed fixes the random choices, so a run can be repeated exactly.' },
+        icon(icons.seed, 15), 'Seed',
         h('input', {
           class: 'seed', type: 'number', min: 1, value: controller.seed,
           onChange: (event: Event) => {
@@ -118,11 +126,11 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
             newRun(controller.scenario, Math.max(1, value));
           },
         })),
-      h('button', { class: 'btn', onClick: () => newRun() }, 'Start over'),
+      h('button', { class: 'btn', onClick: () => newRun() }, icon(icons.restart, 15), 'Start over'),
     );
   }
 
-  /** Every control in one row: what to ask of the agent, then moving through time. */
+  /** Every control in one bar: what to ask of the agent, then moving through time. */
   function renderControls(confident: boolean, position: State): void {
     const { atEnd, playing, cursor } = controller;
     const paused = (action: () => void) => () => {
@@ -130,30 +138,42 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
       action();
     };
     const target = selected && view.isOpen(selected) && !sameState(selected, position) ? selected : null;
+    const iconButton = (symbol: Parameters<typeof icon>[0], title: string, disabled: boolean, onClick: () => void) =>
+      h('button', { class: 'btn btn-icon', title, 'aria-label': title, disabled, onClick }, icon(symbol, 16));
 
     put(controlsEl,
-      h('button', {
-        class: cx('btn', !confident && 'btn-primary'),
-        disabled: confident,
-        title: confident ? 'It is already confident in every action.' : 'Let it act out of curiosity until it is confident.',
-        onClick: () => controller.command({ type: 'explore' }),
-      }, 'Explore'),
-      h('button', {
-        class: cx('btn', target && 'btn-primary'),
-        disabled: !target,
-        title: 'Click a cell, then send the agent there.',
-        onClick: () => {
-          if (!target) return;
-          selected = null;
-          controller.command({ type: 'goal', goal: target });
-        },
-      }, target ? `Send to ${formatState(target)}` : 'Send to a cell'),
-      h('span', { class: 'gap' }),
-      h('button', { class: 'btn', title: 'Back to the start', disabled: cursor === 0, onClick: paused(() => controller.seek(0)) }, '⏮'),
-      h('button', { class: 'btn', title: 'One move back (←)', disabled: cursor === 0, onClick: paused(() => controller.back()) }, '◀'),
-      h('button', { class: 'btn btn-play', title: 'Play or pause (space)', disabled: atEnd, onClick: () => controller.toggle() }, playing ? 'Pause' : 'Play'),
-      h('button', { class: 'btn', title: 'One move forward (→)', disabled: atEnd, onClick: paused(() => controller.forward()) }, '▶'),
-      h('button', { class: 'btn', title: 'Jump to the latest move', disabled: atEnd, onClick: paused(() => controller.seek(Infinity)) }, '⏭'),
+      h('div', { class: 'group' },
+        h('button', {
+          class: cx('btn', 'btn-explore', !confident && 'is-ready'),
+          disabled: confident,
+          title: confident ? 'It is already confident in every action.' : 'Let it act out of curiosity until it is confident.',
+          onClick: () => controller.command({ type: 'explore' }),
+        }, icon(icons.explore, 16), 'Explore'),
+        h('button', {
+          class: cx('btn', 'btn-send', target && 'is-ready'),
+          disabled: !target,
+          title: 'Click a cell, then send the agent there.',
+          onClick: () => {
+            if (!target) return;
+            selected = null;
+            controller.command({ type: 'goal', goal: target });
+          },
+        }, icon(icons.send, 16), target ? `Send to ${formatState(target)}` : 'Send to a cell'),
+      ),
+      h('div', { class: 'group group-transport' },
+        iconButton(icons.toStart, 'Back to the start', cursor === 0, paused(() => controller.seek(0))),
+        iconButton(icons.back, 'One move back (←)', cursor === 0, paused(() => controller.back())),
+        h('button', {
+          class: 'btn btn-play', title: 'Play or pause (space)', 'aria-label': playing ? 'Pause' : 'Play', disabled: atEnd,
+          onClick: () => controller.toggle(),
+        }, icon(playing ? icons.pause : icons.play, 18)),
+        iconButton(icons.forward, 'One move forward (→)', atEnd, paused(() => controller.forward())),
+        iconButton(icons.toEnd, 'Jump to the latest move', atEnd, paused(() => controller.seek(Infinity))),
+      ),
+    );
+
+    put(speedEl,
+      h('span', { class: 'field', title: 'Playback speed' }, icon(icons.speed, 15)),
       h('div', { class: 'segmented segmented-small', 'aria-label': 'Speed' },
         ...SPEEDS.map(([label, speed]) =>
           h('button', {
@@ -191,7 +211,9 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
     renderLevel(levelEl, run.agent);
     renderLearning(learningEl, { agent: run.agent, summary, possibleMoves: view.states().length * run.agent.actions.length });
     renderCellBeliefs(cellEl, { state: selected, agent: run.agent, open: selected ? view.isOpen(selected) : false });
-    renderKnowledge(knowledgeEl, { agent: run.agent, summary, onShowMove: (move) => seek(afterMove(move)) });
+    cellNameEl.textContent = selected ? formatState(selected) : 'none';
+    const shown = renderKnowledge(knowledgeEl, { agent: run.agent, summary, onShowMove: (move) => seek(afterMove(move)) });
+    entryCountEl.textContent = String(shown);
   }
 
   function onKey(event: KeyboardEvent): void {

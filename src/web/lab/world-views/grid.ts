@@ -102,6 +102,11 @@ export function createGridView(
   }
 
   const open = openStates(grid);
+  const agentMark = s('g', { class: 'agent' },
+    s('circle', { class: 'agent-halo', r: 15 }),
+    s('path', { class: 'agent-body', d: 'M0,-11 L11,0 L0,11 L-11,0 Z' }),
+  );
+  agentLayer.append(agentMark);
 
   function update(scene: Scene): void {
     const { run, summary } = scene;
@@ -191,14 +196,11 @@ export function createGridView(
       marks.append(s('rect', { class: 'selected', x: cellX(x) + 1.5, y: cellY(y) + 1.5, width: CELL - 3, height: CELL - 3 }));
     }
 
+    // The agent is one element that slides to its new place.
     const [ax, ay] = centre(position);
     const phase = summary.mode.kind === 'exploring' ? 'explore' : summary.mode.kind === 'heading' ? 'goal' : 'idle';
-    agentLayer.replaceChildren(
-      s('path', {
-        class: `agent agent-${phase}`,
-        d: `M${ax},${ay - 12} L${ax + 12},${ay} L${ax},${ay + 12} L${ax - 12},${ay} Z`,
-      }),
-    );
+    agentMark.setAttribute('class', `agent agent-${phase}`);
+    agentMark.style.transform = `translate(${ax}px, ${ay}px)`;
   }
 
   return {

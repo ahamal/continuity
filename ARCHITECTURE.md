@@ -66,6 +66,7 @@ it up to any point. The site's step-back and timeline rely on this.
 | `world-views/` | One drawing per kind of world. A board game adds its own here. |
 | `panels/` | One file per region: state, timeline, learning, selected cell, knowledge |
 | `words.ts` | Every piece of text made from engine data |
+| `icons.ts` | Every icon the lab uses (Lucide), named in one place |
 
 ### What the viewer must keep true
 
@@ -73,8 +74,8 @@ it up to any point. The site's step-back and timeline rely on this.
   learned. A region belongs to one side.
 - Each fact appears once, in the form that shows it best. A drawing beats a number, and a
   number beats a sentence.
-- Every region has a fixed place. No popups, no tabs.
-- All controls are in one row under the world. Set-up (world, seed) is in the page header.
+- Every region is a titled panel with a fixed place. No popups, no tabs.
+- All controls are in one bar under the world. Set-up (world, seed) is in the page header.
 - Colour is used only for three marks: curiosity, goal and surprise.
 - The level of knowledge is always visible: the headline on the knowledge side, the squares
   per action, and how many moves the agent has tried itself.

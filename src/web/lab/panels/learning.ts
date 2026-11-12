@@ -5,6 +5,7 @@ import type { Agent } from '../../../agents/agent';
 import { factsKey } from '../../../core/facts';
 import type { Summary } from '../../../runs/summary';
 import { cx, h, put } from '../dom';
+import { actionIcon, icon, icons } from '../icons';
 import { formatFacts } from '../words';
 
 export interface LearningProps {
@@ -14,12 +15,18 @@ export interface LearningProps {
   possibleMoves: number | null;
 }
 
-/** One word for how much the agent knows. */
+/** One word for how much the agent knows, as a pill. */
 export function renderLevel(el: HTMLElement, agent: Agent): void {
   const confidence = agent.confidence();
   const seen = confidence.some((row) => row.seen > 0);
   const trusted = confidence.every((row) => row.seen >= row.needed);
-  el.textContent = !seen ? 'Knows nothing' : trusted ? 'Confident' : 'Learning';
+  const [kind, symbol, text] = !seen
+    ? (['idle', icons.nothing, 'Knows nothing'] as const)
+    : trusted
+      ? (['solid', icons.confident, 'Confident'] as const)
+      : (['explore', icons.learning, 'Learning'] as const);
+  el.className = `pill pill-${kind}`;
+  put(el, icon(symbol, 15), text);
 }
 
 export function renderLearning(el: HTMLElement, props: LearningProps): void {
@@ -37,7 +44,7 @@ export function renderLearning(el: HTMLElement, props: LearningProps): void {
     const outcomes = entry ? [...entry.outcomes.values()].sort((a, b) => b.count - a.count) : [];
 
     return h('tr', { class: cx(summary.lastStep?.action === row.action && 'is-latest') },
-      h('th', { scope: 'row' }, row.action),
+      h('th', { scope: 'row' }, h('span', { class: 'action' }, actionIcon(row.action), row.action)),
       h('td', null, squares),
       h('td', { class: 'rule' },
         ...outcomes.map((outcome, i) =>
