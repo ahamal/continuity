@@ -14,24 +14,25 @@ export interface CellProps {
   open: boolean;
 }
 
+/**
+ * The panel always shows one row per action, whether or not a cell is
+ * selected, so it keeps the same height and nothing below it moves.
+ */
 export function renderCellBeliefs(el: HTMLElement, props: CellProps): void {
   const { state, agent } = props;
-  if (!state) {
-    put(el, h('p', { class: 'muted' }, 'Click a cell to see what the agent expects there.'));
-    return;
-  }
-  if (!props.open) {
-    put(el,
-      h('p', { class: 'muted' }, 'A wall. The agent has no entry for it: it only learns which moves do nothing.'));
-    return;
-  }
+  const beliefs = state && props.open ? beliefsAt(agent, state) : null;
 
-  const rows = beliefsAt(agent, state).map((belief) => {
-    const prediction = belief.prediction;
-    const expects = !prediction ? '?' : belief.blocked ? 'stays' : `→ ${formatState(prediction.state)}`;
-    const basis = !prediction ? 'never seen' : prediction.source === 'specific' ? `seen here ×${prediction.count}` : 'assumed';
+  const rows = agent.actions.map((action, i) => {
+    const belief = beliefs?.[i];
+    const prediction = belief?.prediction;
+    let expects = '–';
+    let basis = !state ? 'click a cell' : 'a wall: nothing stored for it';
+    if (belief) {
+      expects = !prediction ? '?' : belief.blocked ? 'stays' : `→ ${formatState(prediction.state)}`;
+      basis = !prediction ? 'never seen' : prediction.source === 'specific' ? `seen here ×${prediction.count}` : 'assumed';
+    }
     return h('tr', { class: prediction?.source === 'specific' ? 'is-seen' : 'is-assumed' },
-      h('th', { scope: 'row' }, h('span', { class: 'action' }, actionIcon(belief.action), belief.action)),
+      h('th', { scope: 'row' }, h('span', { class: 'action' }, actionIcon(action), action)),
       h('td', { class: 'expects' }, expects),
       h('td', { class: 'muted' }, basis),
     );

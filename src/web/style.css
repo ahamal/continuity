@@ -1205,6 +1205,28 @@ body[data-layout='lab'] .pager {
 .beliefs {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.actions th:nth-child(1),
+.beliefs th {
+  width: 92px;
+}
+
+.actions th:nth-child(2) {
+  width: 104px;
+}
+
+.beliefs td:nth-child(2) {
+  width: 120px;
+}
+
+/* A cell's text stays on one line, so a row never changes height. */
+.actions td,
+.beliefs td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .actions th,
@@ -1233,7 +1255,6 @@ body[data-layout='lab'] .pager {
 
 .actions tbody th,
 .beliefs th {
-  width: 86px;
   font-weight: 400;
 }
 
@@ -1249,11 +1270,18 @@ body[data-layout='lab'] .pager {
   color: var(--ink-3);
 }
 
-/* The action of the last move. */
-.actions tr.is-latest .action {
+/*
+  Highlights only ever change colour. They never change size, weight or
+  spacing, so nothing moves when the highlight moves.
+*/
+.action {
   margin-left: -7px;
   padding: 1px 7px;
   border-radius: 3px;
+}
+
+/* The action of the last move. */
+.actions tr.is-latest .action {
   background: var(--bench);
 }
 
@@ -1276,7 +1304,6 @@ body[data-layout='lab'] .pager {
 }
 
 .rule {
-  width: 99%;
   font: 12.5px var(--mono);
 }
 
@@ -1293,6 +1320,12 @@ body[data-layout='lab'] .pager {
   border-top: 1px solid var(--line);
   color: var(--ink-2);
   font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.coverage span {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .coverage-bar {
@@ -1314,7 +1347,6 @@ body[data-layout='lab'] .pager {
 }
 
 .expects {
-  width: 110px;
   font: 13px var(--mono);
 }
 
@@ -1354,14 +1386,21 @@ body[data-layout='lab'] .pager {
   font-weight: 500;
 }
 
-/* Used for the last prediction: a filled row. Written by the last move: bold. */
+/* Used for the last prediction: a filled row with a bar. Written by the last move: a lighter fill. */
+.entry.is-written {
+  background: color-mix(in srgb, var(--bench) 60%, transparent);
+}
+
 .entry.is-used {
   background: var(--bench);
   box-shadow: inset 3px 0 0 var(--ink);
 }
 
-.entry.is-written .entry-text b {
-  font-weight: 700;
+/* An entry stays on one line. */
+.entry-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dot {

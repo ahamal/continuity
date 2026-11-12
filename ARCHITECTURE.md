@@ -77,6 +77,8 @@ it up to any point. The site's step-back and timeline rely on this.
 - Every region is a titled panel with a fixed place. No popups, no tabs.
 - All controls are in one bar under the world. Set-up (world, seed) is in the page header.
 - Colour is used only for three marks: curiosity, goal and surprise.
+- Nothing moves when a highlight or a selection changes. Highlights change colour only, never
+  size, weight or spacing, and a panel keeps its height whatever it shows.
 - The level of knowledge is always visible: the headline on the knowledge side, the squares
   per action, and how many moves the agent has tried itself.
 - Anything shown can be traced: a prediction to its entries, an entry to the move that made it.
