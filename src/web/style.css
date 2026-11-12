@@ -7,19 +7,19 @@
 :root {
   color-scheme: light dark;
 
-  --paper: #f3f1ea;
-  --paper-2: #e8e5da;
-  --side: #ebe8de;
+  --paper: #f6f6f4;
+  --paper-2: #ebebe8;
+  --side: #efefec;
   --ink: #15171a;
   --ink-2: #55575a;
-  --ink-3: #6c6b64;
-  --rule: #cdc9bc;
+  --ink-3: #6b6c6e;
+  --rule: #d4d4d0;
 
   --accent: #2742e0;
   --goal: #0a8756;
-  --block: #b86e00;
+  --block: #d98a00;
   --alarm: #d6381b;
-  --curious: #b86e00;
+  --curious: #d98a00;
 
   --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -499,9 +499,9 @@ code {
 */
 
 :root {
-  --bench: #ece9df;
-  --panel: #f6f4ed;
-  --line: #dad6ca;
+  --bench: #eeeeeb;
+  --panel: #fafaf9;
+  --line: #dcdcd8;
   --radius: 4px;
   --shadow: 0 1px 2px rgb(21 23 26 / 4%);
 }
