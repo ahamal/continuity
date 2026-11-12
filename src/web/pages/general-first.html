@@ -1,0 +1,146 @@
+<div class="story" style="--stage: '0'">
+  <article class="prose">
+    <h1>The fourth agent</h1>
+    <p>
+      This is the fourth build. It keeps the third agent's rows and changes which row answers.
+      It starts from the general row, and a more specific row answers only if it has held every
+      time.
+    </p>
+
+    <h2>How it works</h2>
+    <p>Compared with the third agent, everything in blue is different:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 258" role="img" aria-label="Two drawings of the grid with a wall, showing the same trip from (8, 4) to (2, 4). The third agent expects the column below the wall to be blocked and goes over the top in 14 moves. The fourth agent goes under the wall in 10 moves, which is the shortest route.">
+        <text class="f-th" x="16" y="18">THIRD AGENT</text>
+        <rect class="f-solid" x="110" y="116" width="14" height="14" />
+        <rect class="f-solid" x="110" y="102" width="14" height="14" />
+        <rect class="f-solid" x="110" y="88" width="14" height="14" />
+        <rect class="f-solid" x="110" y="74" width="14" height="14" />
+        <path class="f-rule" d="M54,32 V172 M68,32 V172 M82,32 V172 M96,32 V172 M110,32 V172 M124,32 V172 M138,32 V172 M152,32 V172 M166,32 V172 M40,46 H180 M40,60 H180 M40,74 H180 M40,88 H180 M40,102 H180 M40,116 H180 M40,130 H180 M40,144 H180 M40,158 H180" />
+        <rect class="f-ink" x="40" y="32" width="140" height="140" />
+        <path class="f-bar" d="M110,160.5 V169.5" />
+        <path class="f-bar" d="M110,146.5 V155.5" />
+        <path class="f-bar" d="M110,132.5 V141.5" />
+        <path class="f-bar" d="M124,160.5 V169.5" />
+        <path class="f-bar" d="M124,146.5 V155.5" />
+        <path class="f-bar" d="M124,132.5 V141.5" />
+        <path class="f-bar" d="M154.5,158 H163.5" />
+        <path class="f-bar" d="M154.5,144 H163.5" />
+        <path class="f-ink" d="M159.0,109.0 L145.0,109.0 L131.0,109.0 L131.0,95.0 L131.0,81.0 L131.0,67.0 L131.0,53.0 L117.0,53.0 L103.0,53.0 L89.0,53.0 L75.0,53.0 L75.0,67.0 L75.0,81.0 L75.0,95.0 L75.0,109.0" />
+        <path class="f-solid" d="M159.0,104.0 L164.0,109.0 L159.0,114.0 L154.0,109.0 Z" />
+        <circle class="f-paper" cx="75.0" cy="109.0" r="4" />
+        <text class="f-t" x="192" y="102">14 moves</text>
+        <text class="f-tm" x="192" y="116">shortest is 10</text>
+        <text class="f-th" x="16" y="198">WRITES</text>
+        <text class="f-t" x="82" y="198">every combination</text>
+        <text class="f-th" x="16" y="214">ANSWERS</text>
+        <text class="f-t" x="82" y="214">the most specific row it has</text>
+        <text class="f-th" x="16" y="230">EXPLORES</text>
+        <text class="f-t" x="82" y="230">goes to the move it is least sure of</text>
+        <path class="f-rule" d="M320,8 V252" />
+        <text class="f-th" x="340" y="18">FOURTH AGENT</text>
+        <rect class="f-solid" x="434" y="116" width="14" height="14" />
+        <rect class="f-solid" x="434" y="102" width="14" height="14" />
+        <rect class="f-solid" x="434" y="88" width="14" height="14" />
+        <rect class="f-solid" x="434" y="74" width="14" height="14" />
+        <path class="f-rule" d="M378,32 V172 M392,32 V172 M406,32 V172 M420,32 V172 M434,32 V172 M448,32 V172 M462,32 V172 M476,32 V172 M490,32 V172 M364,46 H504 M364,60 H504 M364,74 H504 M364,88 H504 M364,102 H504 M364,116 H504 M364,130 H504 M364,144 H504 M364,158 H504" />
+        <rect class="f-ink" x="364" y="32" width="140" height="140" />
+        <path class="f-bar" d="M490,76.5 V85.5" />
+        <path class="f-bar" d="M490,76.5 V85.5" />
+        <path class="f-accent" d="M483.0,109.0 L469.0,109.0 L455.0,109.0 L455.0,123.0 L455.0,137.0 L441.0,137.0 L427.0,137.0 L413.0,137.0 L399.0,137.0 L399.0,123.0 L399.0,109.0" />
+        <path class="f-solid" d="M483.0,104.0 L488.0,109.0 L483.0,114.0 L478.0,109.0 Z" />
+        <circle class="f-paper" cx="399.0" cy="109.0" r="4" />
+        <text class="f-ta" x="516" y="102">10 moves</text>
+        <text class="f-tm" x="516" y="116">shortest is 10</text>
+        <text class="f-th" x="340" y="198">WRITES</text>
+        <text class="f-tm" x="406" y="198">the same</text>
+        <text class="f-th" x="340" y="214">ANSWERS</text>
+        <text class="f-ta" x="406" y="214">the general row, unless a more</text>
+        <text class="f-th" x="340" y="230"></text>
+        <text class="f-ta" x="406" y="230">specific row has held every time</text>
+        <text class="f-th" x="340" y="246">EXPLORES</text>
+        <text class="f-tm" x="406" y="246">the same</text>
+      </svg>
+      <figcaption><b>Fig 6.1</b>The same trip, from (8, 4) to (2, 4), after each agent has crossed the wall a few times. A bar is a move the agent expects to do nothing where in fact it would move. The third agent expects the column below the wall to be blocked, and goes over the top.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Writes.</strong> The same rows as the third agent, counted the same way.</li>
+      <li>
+        <strong>Answers.</strong> For a move it has made, with what that move did. Otherwise it
+        starts from the general row: of the rows with one fact, the one that has been right
+        about the most moves. A more specific row beneath it answers instead only if it has
+        held every time it was seen. A row that has failed even once is not followed.
+      </li>
+      <li><strong>Explores.</strong> The same way as the third agent.</li>
+    </ul>
+    <p>
+      This is the difference between the edge and a guess. "Going right at x = 9 changes
+      nothing" has held every single time, so it answers for the whole edge. "Going right at x
+      = 4 changes nothing" came from three bumps into the wall. Once the agent got past at x =
+      4 somewhere else, that row had held 3 times out of 5. The third agent went on following
+      it, over "going right adds one to x" at 23 out of 26, because it is the more specific
+      row. The fourth agent drops it. The bumps it saw at the wall still stand, each as its own
+      row, and everywhere else in the column the general row answers.
+    </p>
+
+    <h2>Try it</h2>
+    <p>
+      Press Explore. Then send it to a cell beyond the wall and back, a few times, and watch
+      which way it goes round. The knowledge base on the right shows each general row, with the
+      rows that have always held indented under it.
+    </p>
+  </article>
+
+  <div class="demo" data-demo="general"></div>
+
+  <article class="prose">
+    <h2>Results</h2>
+    <p>
+      The earlier test asks only whether a goal is reached, and this agent reaches it in all
+      three worlds, as the third one does. To see the difference we need a test of the routes.
+      Each agent explores, then makes ten trips to cells picked at random, one after another.
+      That is 500 trips over 50 runs, each compared with the shortest route there is.
+    </p>
+    <table class="facts-table">
+      <thead>
+        <tr><th>On the grid with a wall</th><th>Trips that reached the goal</th><th>Moves, against the shortest routes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>First agent</td><td>482 of 500</td><td>7% more</td></tr>
+        <tr><td>Second agent</td><td>265 of 500</td><td>14% more</td></tr>
+        <tr><td>Third agent</td><td>494 of 500</td><td>15% more</td></tr>
+        <tr><td>Fourth agent</td><td>500 of 500</td><td>8% more</td></tr>
+      </tbody>
+    </table>
+    <p>
+      The fourth agent is the only one that reaches every trip. Its routes are about half as
+      wasteful as the third agent's. The moves are counted over the trips that were reached, so
+      the first agent's 7% leaves out the 18 trips it gave up on.
+    </p>
+    <p>
+      On the open grid, with no wall, it takes the shortest route on all 500 trips.
+    </p>
+
+    <h2>What is missing</h2>
+    <p>
+      Some of the 8% that is left is bumps. The agent still learns the wall one cell at a time:
+      each cell beside it costs one bump before the agent knows it is blocked. That is the same
+      limit as before. "Something is in the way" cannot be said with x and y.
+    </p>
+    <p>
+      "Held every time" is also a strict test. It suits a world with no chance in it. In a
+      world where the same move can turn out differently, nothing would hold every time, and
+      this agent would follow only its general rows.
+    </p>
+    <p>
+      Everything else we hand it is unchanged from the third agent: the facts themselves, that
+      the question is what will change, and writing every combination, which does not scale.
+    </p>
+
+    <h2>Next</h2>
+    <p>
+      The next page puts together what the four agents showed. The question it ends on is where
+      the facts come from.
+    </p>
+  </article>
+</div>

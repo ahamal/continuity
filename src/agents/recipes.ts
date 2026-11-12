@@ -8,6 +8,11 @@ import {
 } from './every-combination/every-combination';
 import { curiosityFromBacking, everyRowPredictor, everyRowStorage } from './every-row/every-row';
 import { countOnceStorage, fromCountsPredictor, seekLeastSure, throughThinRows } from './from-counts/from-counts';
+import {
+  generalFirstPredictor,
+  seekLeastSureGeneralFirst,
+  throughThinRowsGeneralFirst,
+} from './general-first/general-first';
 import { hierarchyPredictor, movesStorage, seekUntried, throughGuesses } from './hierarchy/hierarchy';
 import { searchThenGreedy } from './planning/search-then-greedy';
 import { coordinates } from './representations/coordinates';
@@ -141,7 +146,31 @@ export const fromCounts: Recipe = {
     ),
 };
 
-export const recipes: Recipe[] = [twoLevels, everyCombination, everyRow, hierarchy, fromCounts];
+/**
+ * The store of `fromCounts`, read from the general row down. A more specific
+ * row answers only if it has held every time, so a row that has failed is not
+ * followed.
+ */
+export const generalFirst: Recipe = {
+  id: 'general-first',
+  label: 'General first',
+  summary:
+    'Stores every combination. Starts from the general row, and a more specific row answers only if it has held every time.',
+  build: (shape, random) =>
+    new Agent(
+      shape.actions,
+      {
+        representation: coordinates(shape.stateParts),
+        storage: countOnceStorage,
+        predictor: generalFirstPredictor,
+        explorer: seekLeastSureGeneralFirst(),
+        planner: throughThinRowsGeneralFirst(searchThenGreedy({ maxVisited: 2000 }), 5),
+      },
+      random,
+    ),
+};
+
+export const recipes: Recipe[] = [twoLevels, everyCombination, everyRow, hierarchy, fromCounts, generalFirst];
 
 export function findRecipe(id: string): Recipe | undefined {
   return recipes.find((recipe) => recipe.id === id);

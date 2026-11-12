@@ -21,9 +21,10 @@ decided in advance. The aim of this part is to understand, not to make anything 
 | The first agent | The two-level agent (`two-levels`), and what it cannot hold |
 | The second agent | Every combination written down, and every row voting (`every-row`). It does worse, and why |
 | The third agent | The same rows, answered by the most specific one (`from-counts`). 500 of 500 in all three worlds |
+| The fourth agent | The same rows, read from the general row down (`general-first`). A more specific row answers only if it has held every time. Reaches all 500 random trips on the grid with a wall |
 | Findings | What part 1 showed, and where part 2 starts |
 
-Five agents exist in the code and the tests. Two are steps on the way and have no page of
+Six agents exist in the code and the tests. Two are steps on the way and have no page of
 their own: `every-combination`, which stores everything but reads it as the two-level agent
 does, and `hierarchy`, which was built by hand to show the shape that is wanted.
 
@@ -36,6 +37,18 @@ Runs solved over seeds 1 to 500 (`npm run bench`). The tests pin these numbers.
 | Every row has a say | 500 | 131 | 59 |
 | Every row holds | 500 | 500 | 500 |
 | Read from the counts | 500 | 500 | 500 |
+| General first | 500 | 500 | 500 |
+
+The third and fourth agents' exploring hardly uses chance, so on the line and on the grid with
+walls their 500 runs are one run repeated. A second test (`src/runs/routes.ts`) compares routes:
+after exploring, ten trips to cells picked at random, in each of 50 runs, on the grid with walls.
+
+| Agent | Trips reached, of 500 | Moves against the shortest routes |
+|---|---|---|
+| Two levels | 482 | 7% more |
+| Every row has a say | 265 | 14% more |
+| Read from the counts | 494 | 15% more |
+| General first | 500 | 8% more |
 
 ### Two levels
 
@@ -114,6 +127,34 @@ steps) and plans through rows seen fewer than five times, with 2,000 places to s
 
 Still chosen in the code: that the question is what will change, the "+ 1", and those
 exploring and planning numbers.
+
+What it gets wrong: it follows the most specific row whatever its record. After three bumps
+into the wall, "right at x = 4 changes nothing" answers for the whole column, and it goes on
+answering after the agent has got past at x = 4 elsewhere and the row has held 3 times out of
+5. So the agent keeps going round the wall the one way it knows, 14 moves where 10 would do.
+The tests used when the earlier rule was dropped only asked whether a goal was reached, so
+they did not show this.
+
+### General first
+
+The same store, read from the general row down.
+
+1. For a move it has made, that move's own row answers.
+2. Otherwise it starts from the general row: of the rows with one fact, the one that has been
+   right about the most moves.
+3. A more specific row beneath it answers instead only if it has held every time it was seen.
+   Between rows equally specific, the one with the better standing.
+
+A row that has failed is not followed. The rows beneath it that do hold are followed where
+they apply, and the general row everywhere else. So the edge stays one row, and a guess about
+a wall is dropped the first time it fails (`tests/general-first.test.ts`).
+
+On the trips test it reaches all 500 trips on the grid with walls, with routes 8% longer than
+the shortest, against 494 trips and 15% for the agent above. Some of what is left is bumps:
+each cell beside the wall still costs one. How much of the 8% that is has not been measured.
+
+Still chosen in the code: everything above, and that a row must hold every time, which would
+not suit a world with chance in it.
 
 ## Part 2: working backwards
 

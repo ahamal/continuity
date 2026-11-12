@@ -7,6 +7,69 @@
     </p>
 
     <h2>How it works</h2>
+    <p>Compared with the first agent, everything in blue is different:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 246" role="img" aria-label="Two diagrams of the seven combinations of the facts action, x and y. The first agent writes two of them and answers with the exact place first, then the move alone. The second agent writes all seven, and all of them vote.">
+        <text class="f-th" x="16" y="18">FIRST AGENT</text>
+        <path class="f-rule" d="M112,57 L112,99 M112,57 L192,99 M192,57 L112,99 M192,57 L272,99 M272,57 L192,99 M272,57 L272,99 M112,109 L192,151 M192,109 L192,151 M272,109 L192,151" />
+        <rect class="f-thin" x="103.5" y="43.5" width="17" height="17" />
+        <rect class="f-solid" x="107.5" y="47.5" width="9" height="9" />
+        <text class="f-t" x="112" y="38" text-anchor="middle">action</text>
+        <rect class="f-paper f-dash" x="187.5" y="47.5" width="9" height="9" />
+        <text class="f-tm" x="192" y="38" text-anchor="middle">x</text>
+        <rect class="f-paper f-dash" x="267.5" y="47.5" width="9" height="9" />
+        <text class="f-tm" x="272" y="38" text-anchor="middle">y</text>
+        <rect class="f-paper f-dash" x="107.5" y="99.5" width="9" height="9" />
+        <text class="f-tm" x="112" y="126" text-anchor="middle">action, x</text>
+        <rect class="f-paper f-dash" x="187.5" y="99.5" width="9" height="9" />
+        <text class="f-tm" x="192" y="126" text-anchor="middle">action, y</text>
+        <rect class="f-paper f-dash" x="267.5" y="99.5" width="9" height="9" />
+        <text class="f-tm" x="272" y="126" text-anchor="middle">x, y</text>
+        <rect class="f-thin" x="183.5" y="147.5" width="17" height="17" />
+        <rect class="f-solid" x="187.5" y="151.5" width="9" height="9" />
+        <text class="f-t" x="192" y="178" text-anchor="middle">action, x, y</text>
+        <text class="f-t" x="16" y="160">1st</text>
+        <text class="f-t" x="16" y="56">2nd</text>
+        <text class="f-th" x="16" y="206">WRITES</text>
+        <text class="f-t" x="82" y="206">2 of the 7 combinations</text>
+        <text class="f-th" x="16" y="222">ANSWERS</text>
+        <text class="f-t" x="82" y="222">exact place, else the move alone</text>
+        <text class="f-th" x="16" y="238">EXPLORES</text>
+        <text class="f-t" x="82" y="238">until each move is seen 5 times</text>
+        <path class="f-rule" d="M320,8 V240" />
+        <text class="f-th" x="340" y="18">SECOND AGENT</text>
+        <path class="f-rule" d="M436,57 L436,99 M436,57 L516,99 M516,57 L436,99 M516,57 L596,99 M596,57 L516,99 M596,57 L596,99 M436,109 L516,151 M516,109 L516,151 M596,109 L516,151" />
+        <rect class="f-accent" x="427.5" y="43.5" width="17" height="17" />
+        <rect class="f-solid" x="431.5" y="47.5" width="9" height="9" />
+        <text class="f-t" x="436" y="38" text-anchor="middle">action</text>
+        <rect class="f-accent" x="507.5" y="43.5" width="17" height="17" />
+        <rect class="f-solid" x="511.5" y="47.5" width="9" height="9" />
+        <text class="f-t" x="516" y="38" text-anchor="middle">x</text>
+        <rect class="f-accent" x="587.5" y="43.5" width="17" height="17" />
+        <rect class="f-solid" x="591.5" y="47.5" width="9" height="9" />
+        <text class="f-t" x="596" y="38" text-anchor="middle">y</text>
+        <rect class="f-accent" x="427.5" y="95.5" width="17" height="17" />
+        <rect class="f-solid" x="431.5" y="99.5" width="9" height="9" />
+        <text class="f-t" x="436" y="126" text-anchor="middle">action, x</text>
+        <rect class="f-accent" x="507.5" y="95.5" width="17" height="17" />
+        <rect class="f-solid" x="511.5" y="99.5" width="9" height="9" />
+        <text class="f-t" x="516" y="126" text-anchor="middle">action, y</text>
+        <rect class="f-accent" x="587.5" y="95.5" width="17" height="17" />
+        <rect class="f-solid" x="591.5" y="99.5" width="9" height="9" />
+        <text class="f-t" x="596" y="126" text-anchor="middle">x, y</text>
+        <rect class="f-accent" x="507.5" y="147.5" width="17" height="17" />
+        <rect class="f-solid" x="511.5" y="151.5" width="9" height="9" />
+        <text class="f-t" x="516" y="178" text-anchor="middle">action, x, y</text>
+        <text class="f-ta" x="340" y="108">all vote</text>
+        <text class="f-th" x="340" y="206">WRITES</text>
+        <text class="f-ta" x="406" y="206">all 7 combinations</text>
+        <text class="f-th" x="340" y="222">ANSWERS</text>
+        <text class="f-ta" x="406" y="222">every row votes, best share wins</text>
+        <text class="f-th" x="340" y="238">EXPLORES</text>
+        <text class="f-ta" x="406" y="238">until its answer has held 5 times</text>
+      </svg>
+      <figcaption><b>Fig 4.1</b>Filled squares are rows that get written, and a box around one means it can answer. Drawn with three of the facts in a move. With all seven facts there are 127 combinations, and the first agent writes two of them.</figcaption>
+    </figure>
     <ul>
       <li>
         <strong>Writes.</strong> A move on the grid is seven facts seen together: the move, x

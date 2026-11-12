@@ -18,10 +18,10 @@
     "solved": 500,
     "failed": 0,
     "meanExploreSteps": 100,
-    "meanGoalSteps": 43,
-    "meanSurprises": 0,
-    "meanEntries": 8985,
-    "greedyPlans": 500
+    "meanGoalSteps": 32.9,
+    "meanSurprises": 0.01,
+    "meanEntries": 8680.53,
+    "greedyPlans": 0
   },
   {
     "recipe": "from-counts",
@@ -30,9 +30,9 @@
     "solved": 500,
     "failed": 0,
     "meanExploreSteps": 100,
-    "meanGoalSteps": 4,
+    "meanGoalSteps": 1,
     "meanSurprises": 0,
-    "meanEntries": 6775,
+    "meanEntries": 6665,
     "greedyPlans": 0
   }
 ]

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { blockedMoves } from '../src/agents/inspect';
-import { everyRow, fromCounts, hierarchy, twoLevels } from '../src/agents/recipes';
+import { everyRow, fromCounts, generalFirst, hierarchy, twoLevels } from '../src/agents/recipes';
 import { bench } from '../src/runs/bench';
+import { routes } from '../src/runs/routes';
 import { Run, replay } from '../src/runs/run';
 import { summarise } from '../src/runs/summary';
 import { findScenario } from '../src/worlds/scenarios';
@@ -111,5 +112,28 @@ describe('pinned results', () => {
     expect(solved('1d')).toBe(500);
     expect(solved('2d')).toBe(500);
     expect(solved('2d-walls')).toBe(500);
+  }, 60_000);
+
+  it('general first, seeds 1 to 500', () => {
+    const solved = (id: string) => bench(generalFirst, findScenario(id)!, 500).solved;
+    expect(solved('1d')).toBe(500);
+    expect(solved('2d')).toBe(500);
+    expect(solved('2d-walls')).toBe(500);
+  }, 120_000);
+
+  // Ten trips to cells picked at random, in each of 50 runs, compared with the
+  // shortest route for each trip.
+  it('routes on the grid with a wall', () => {
+    const walls = findScenario('2d-walls')!;
+    expect(routes(twoLevels, walls, 50)).toMatchObject({ trips: 500, reached: 482, moves: 3383, shortest: 3166 });
+    expect(routes(everyRow, walls, 50)).toMatchObject({ trips: 500, reached: 265, moves: 1708, shortest: 1497 });
+    expect(routes(fromCounts, walls, 50)).toMatchObject({ trips: 500, reached: 494, moves: 3980, shortest: 3455 });
+    expect(routes(generalFirst, walls, 50)).toMatchObject({ trips: 500, reached: 500, moves: 3813, shortest: 3532 });
+  }, 60_000);
+
+  it('routes on the open grid', () => {
+    const open = findScenario('2d')!;
+    expect(routes(fromCounts, open, 50)).toMatchObject({ reached: 500, shortestTaken: 499 });
+    expect(routes(generalFirst, open, 50)).toMatchObject({ reached: 500, shortestTaken: 500 });
   }, 60_000);
 });

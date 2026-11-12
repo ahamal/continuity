@@ -2,11 +2,11 @@
   <h1>Findings</h1>
 
   <p>
-    We built three agents from the conjecture and ran each of them in three small worlds. This
+    We built four agents from the conjecture and ran each of them in three small worlds. This
     page puts together what they showed, and what has to come next.
   </p>
 
-  <h2>The three agents</h2>
+  <h2>The four agents</h2>
   <table class="facts-table">
     <thead>
       <tr><th>Agent</th><th>Writes</th><th>Answers</th><th>Line</th><th>Grid</th><th>Grid with a wall</th></tr>
@@ -15,12 +15,30 @@
       <tr><td>First</td><td>Two rows for every move: the move alone, and the move at one exact place</td><td>With the exact place if it has it, otherwise with the move alone</td><td>500</td><td>500</td><td>367</td></tr>
       <tr><td>Second</td><td>A row for every combination of the facts in a move</td><td>Every row that applies votes</td><td>500</td><td>131</td><td>59</td></tr>
       <tr><td>Third</td><td>The same rows, with each different move counted once</td><td>With the most specific row that applies</td><td>500</td><td>500</td><td>500</td></tr>
+      <tr><td>Fourth</td><td>The same as the third</td><td>With the general row, unless a more specific row has held every time</td><td>500</td><td>500</td><td>500</td></tr>
     </tbody>
   </table>
   <p>
     The numbers are runs that reached the goal, out of 500. In each run the agent explores
-    first and is then sent to a goal.
+    first and is then sent to a goal. For the third and fourth agents these numbers say less
+    than they seem to. Their exploring hardly uses chance, so on the line and on the grid with
+    a wall the 500 runs are one run repeated.
   </p>
+  <p>
+    A harder test compares routes. Each agent explores, then makes ten trips to cells picked at
+    random, one after another: 500 trips over 50 runs, on the grid with a wall.
+  </p>
+  <table class="facts-table">
+    <thead>
+      <tr><th>Agent</th><th>Trips that reached the goal</th><th>Moves, against the shortest routes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>First</td><td>482 of 500</td><td>7% more</td></tr>
+      <tr><td>Second</td><td>265 of 500</td><td>14% more</td></tr>
+      <tr><td>Third</td><td>494 of 500</td><td>15% more</td></tr>
+      <tr><td>Fourth</td><td>500 of 500</td><td>8% more</td></tr>
+    </tbody>
+  </table>
   <p>
     Two more agents were built along the way and have no page of their own. One stores every
     combination but answers like the first agent, and gets the same results as the first. The
@@ -31,9 +49,10 @@
   <h2>What worked</h2>
   <ol>
     <li>
-      <strong>The conjecture can be built.</strong> The third agent starts with no knowledge of
-      its world and no training. It learns a line, a grid, and a grid with a wall, and it
-      reaches its goal in all 1,500 runs.
+      <strong>The conjecture can be built.</strong> The fourth agent starts with no knowledge
+      of its world and no training. It learns a line, a grid, and a grid with a wall. On the
+      grid with a wall it reaches the goal on all 500 trips to cells picked at random, and its
+      routes are 8% longer than the shortest there are.
     </li>
     <li>
       <strong>General assumptions reach places the agent has never been.</strong> After a few
@@ -53,10 +72,17 @@
       every time within its own range.
     </li>
     <li>
+      <strong>Only a row that has held every time should answer for the general one.</strong>
+      The third agent followed "going right at x = 4 changes nothing" after it had held only 3
+      times out of 5, and kept going round the wall the long way. The fourth agent drops a row
+      the first time it fails, and takes the shorter way. The edge, which has never failed,
+      stays one row.
+    </li>
+    <li>
       <strong>Being wrong needs nothing extra.</strong> A wrong prediction is written like any
       other move, and because it is more specific, it answers from then on. The agent does have
-      to try its guesses, though. The third agent goes to the moves it is least sure about, and
-      that is how it finds the wall.
+      to try its guesses, though. The third and fourth agents go to the moves they are least sure about, and
+      that is how they find the wall.
     </li>
   </ol>
 
@@ -80,7 +106,7 @@
   </table>
   <p>The first two are measured. The last two we have not built yet.</p>
   <p>
-    Better facts have a cost. The third agent writes every combination of the facts in a move,
+    Better facts have a cost. The third and fourth agents write every combination of the facts in a move,
     and a fact about the state appears in a move twice, before and after. So each fact added
     multiplies the rows by four:
   </p>

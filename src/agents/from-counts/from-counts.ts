@@ -361,3 +361,11 @@ export function throughThinRows(inner: Planner, minSeen = 5): Planner {
     },
   };
 }
+
+// ---- for later agents that read the same store another way -----------------
+//
+// Nothing below changes how this agent works. It lets a later agent look at
+// the same rows and decide differently which of them answers.
+
+export { applicable as rowsThatApply, changeOf, knownOf, made as wasMade, memoryOf as memoryFor, standing };
+export type { Memory, Slot };

@@ -6,9 +6,10 @@
 // stage number down, so that the list can be reordered.
 
 import { movesCounted, readHierarchy } from '../../agents/from-counts/from-counts';
-import { everyRow, fromCounts, twoLevels } from '../../agents/recipes';
+import { everyRow, fromCounts, generalFirst, twoLevels } from '../../agents/recipes';
 import { type LabOptions, createLab } from '../lab/lab';
 import findings from './findings.html?raw';
+import generalFirstPage from './general-first.html?raw';
 import hierarchy from './hierarchy.html?raw';
 import implementation from './implementation.html?raw';
 import remembering from './remembering.html?raw';
@@ -64,6 +65,16 @@ const demos: Record<string, LabOptions> = {
     hierarchy: (agent) => ({ rows: readHierarchy(agent), moves: movesCounted(agent) }),
     stays: 'expected',
   },
+  // The same store, read from the general row down.
+  general: {
+    recipe: generalFirst,
+    scenarioIds: WORLDS,
+    compact: true,
+    knowledge: 'hierarchy',
+    holdsTitle: 'Knowledge base',
+    hierarchy: (agent) => ({ rows: readHierarchy(agent), moves: movesCounted(agent) }),
+    stays: 'expected',
+  },
 };
 
 /**
@@ -92,5 +103,6 @@ export const pages: Page[] = [
   { id: 'remembering', label: 'The first agent', part: 1, mount: paper(remembering) },
   { id: 'voting', label: 'The second agent', part: 1, mount: paper(voting) },
   { id: 'hierarchy', label: 'The third agent', part: 1, mount: paper(hierarchy) },
+  { id: 'general-first', label: 'The fourth agent', part: 1, mount: paper(generalFirstPage) },
   { id: 'findings', label: 'Findings', part: 1, current: true, mount: paper(findings) },
 ];
