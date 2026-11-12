@@ -1,3 +1,5 @@
+import type { Facts } from '../core/facts';
+import type { Entry } from '../core/knowledge-base';
 import { type Action, type State, sameState } from '../core/state';
 import type { Agent } from './agent';
 import type { Prediction } from './parts';
@@ -62,4 +64,28 @@ export function blockedMoves(agent: Agent, states: readonly State[]): BlockedMov
     }
   }
   return found;
+}
+
+/** One question put to the knowledge base, and how it was answered. */
+export interface Lookup {
+  action: Action;
+  /** The facts of the situation: the state as the agent describes it, and the action. */
+  question: Facts;
+  /** Every stored entry whose inputs are all among those facts. */
+  matches: Entry[];
+  /** What the agent predicts, with the keys of the entries that answered. */
+  prediction: Prediction | null;
+}
+
+/** For each action in `state`: which entries apply, and which one answers. */
+export function lookupsAt(agent: Agent, state: State): Lookup[] {
+  return agent.actions.map((action) => {
+    const question = { ...agent.representation.describe(state), action };
+    return {
+      action,
+      question,
+      matches: agent.kb.matching(question),
+      prediction: agent.predict(state, action),
+    };
+  });
 }

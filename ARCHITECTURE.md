@@ -64,7 +64,7 @@ it up to any point. The site's step-back and timeline rely on this.
 | `controller.ts` | Holds the run and the position in it. No drawing. |
 | `lab.ts` | Arranges the regions and passes each what to show |
 | `world-views/` | One drawing per kind of world. A board game adds its own here. |
-| `panels/` | One file per region: state, timeline, learning, selected cell, knowledge |
+| `panels/` | One file per region: state, timeline, knowledge (the stored table), lookup, learning |
 | `words.ts` | Every piece of text made from engine data |
 | `icons.ts` | Every icon the lab uses (Lucide), named in one place |
 
@@ -79,6 +79,7 @@ it up to any point. The site's step-back and timeline rely on this.
 - Colour is used only for three marks: curiosity, goal and surprise.
 - Nothing moves when a highlight or a selection changes. Highlights change colour only, never
   size, weight or spacing, and a panel keeps its height whatever it shows.
-- The level of knowledge is always visible: the headline on the knowledge side, the squares
-  per action, and how many moves the agent has tried itself.
+- The knowledge side is honest. The knowledge base is shown as it is stored: every row, every
+  outcome, nothing grouped or renamed. Anything the code reads out of it (a lookup,
+  confidence) is in its own panel and says how it is worked out.
 - Anything shown can be traced: a prediction to its entries, an entry to the move that made it.

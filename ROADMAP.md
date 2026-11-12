@@ -13,19 +13,20 @@ numbers from the benchmark.
 | 1 | Background theory | Written |
 | 2 | Implementation | Written |
 | 3 | 1D world | Runs |
-| 4 | 2D world, with and without walls | Runs |
-| 5 | Better representation of states | In progress |
-| 6 | Several things in one world, unlabelled, grouped into kinds | Planned |
-| 7 | Learning by watching moves it did not make | Planned |
-| 8 | Tic-tac-toe and Connect Four | Planned |
-| 9 | Checkers | Planned |
-| 10 | Chess movement, then check and the special moves | Planned |
-| 11 | Playing, by search over the learned rules | Planned |
-| 12 | Transfer across games, measured | Planned |
+| 4 | 2D world | Runs |
+| 5 | 2D world with walls | Runs |
+| 6 | Better representation of states | In progress |
+| 7 | Several things in one world, unlabelled, grouped into kinds | Planned |
+| 8 | Learning by watching moves it did not make | Planned |
+| 9 | Tic-tac-toe and Connect Four | Planned |
+| 10 | Checkers | Planned |
+| 11 | Chess movement, then check and the special moves | Planned |
+| 12 | Playing, by search over the learned rules | Planned |
+| 13 | Transfer across games, measured | Planned |
 
-Stages after 6 are provisional.
+Stages after 7 are provisional.
 
-## Where stage 4 stands
+## Where stages 3 to 5 stand
 
 Measured over seeds 1 to 500 (`npm run bench`):
 
@@ -35,7 +36,7 @@ Measured over seeds 1 to 500 (`npm run bench`):
 | 2D grid | 500 of 500 |
 | 2D grid with walls | 367 of 500 |
 
-Known limits, which stage 5 starts from:
+Known limits, which stage 6 starts from:
 
 - Only two levels of generality are stored: the action alone, and the action in one exact
   state. Nothing in between, such as "at x = 9, right does nothing".
@@ -45,9 +46,9 @@ Known limits, which stage 5 starts from:
 - There is one thing in the world, and its identity is given.
 - An entry keeps every outcome it has seen, but predictions use only the most frequent one.
 
-## Stage 5 is done when
+## Stage 6 is done when
 
 - Levels between "always" and "exactly here" come to exist without storing every combination.
 - The agent learns an edge or a wall as one rule, not one cell at a time.
 - The same representation serves the line and the grid.
-- The walls scenario is solved more often than 367 of 500, with the stage 4 numbers unchanged.
+- The walls scenario is solved more often than 367 of 500, with the numbers of stages 3 to 5 unchanged.

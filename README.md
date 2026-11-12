@@ -13,11 +13,11 @@ them, and that handles the 1D and 2D grid worlds the same way.
 
 ## Stages
 
-The site records the work stage by stage, with the thinking behind each one. Stages 1 to 4 are
-done and stage 5 is in progress. See [ROADMAP.md](ROADMAP.md) for all the stages and
+The site records the work stage by stage, with the thinking behind each one. Stages 1 to 5 are
+done and stage 6 is in progress. See [ROADMAP.md](ROADMAP.md) for all the stages and
 [ARCHITECTURE.md](ARCHITECTURE.md) for how the code is organised.
 
-Stages 3 and 4 are a port of the original Python engine, with the same behaviour.
+Stages 3 to 5 are a port of the original Python engine, with the same behaviour.
 
 ## Run it
 
@@ -50,7 +50,7 @@ src/
   experiments/  command-line programs
   web/
     pages/      one page per stage
-    lab/        the interactive view used by stages 3 and 4
+    lab/        the interactive view used by stages 3 to 5
 tests/
 results/        saved benchmark tables
 ```

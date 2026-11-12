@@ -11,9 +11,11 @@ import { type Scenario, findScenario } from '../../worlds/scenarios';
 import { Controller } from './controller';
 import { cx, h, put } from './dom';
 import { icon, icons } from './icons';
-import { renderCellBeliefs } from './panels/cell';
-import { renderKnowledge } from './panels/knowledge';
-import { renderLearning, renderLevel } from './panels/learning';
+import { lookupsAt } from '../../agents/inspect';
+import { formatFacts } from './words';
+import { type Sort, renderKnowledge } from './panels/knowledge';
+import { renderLearning } from './panels/learning';
+import { renderLookup } from './panels/lookup';
 import { renderActivity, renderLastMove } from './panels/state';
 import { createTimeline } from './panels/timeline';
 import { type WorldView, createWorldView } from './world-views';
@@ -38,6 +40,7 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
 
   let selected: State | null = null;
   let view: WorldView;
+  let sort: Sort = 'written';
 
   // State side.
   const activityEl = h('span', { class: 'pill', 'aria-live': 'polite' });
@@ -47,12 +50,12 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
   const timelineEl = h('div', { class: 'timeline' });
   const speedEl = h('div', { class: 'group' });
   // Knowledge side.
-  const levelEl = h('span', { class: 'pill' });
-  const learningEl = h('div', { class: 'panel-body' });
-  const cellNameEl = h('span', { class: 'panel-note' });
-  const cellEl = h('div', { class: 'panel-body' });
-  const entryCountEl = h('span', { class: 'panel-note' });
+  // First what is stored, then what the code reads out of it.
+  const kbAsideEl = h('span', { class: 'panel-aside' });
   const knowledgeEl = h('div', { class: 'panel-body panel-scroll' });
+  const lookupNameEl = h('span', { class: 'panel-note' });
+  const lookupEl = h('div', { class: 'panel-body' });
+  const learningEl = h('div', { class: 'panel-body' });
   // Set-up: chosen before a run, so it sits apart from both sides.
   const setupEl = options.setupSlot ?? h('div', { class: 'setup' });
 
@@ -86,9 +89,9 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
         h('section', { class: 'panel panel-controls' }, controlsEl, h('div', { class: 'time-row' }, timelineEl, speedEl)),
       ),
       h('div', { class: 'col' },
-        panel('learning', icons.knowledge, 'Knowledge', levelEl, learningEl),
-        panel('cell', icons.cell, 'Selected cell', cellNameEl, cellEl),
-        panel('entries', icons.entries, 'Stored cases', entryCountEl, knowledgeEl),
+        panel('entries', icons.entries, 'Knowledge base', kbAsideEl, knowledgeEl),
+        panel('lookup', icons.cell, 'Lookup', lookupNameEl, lookupEl),
+        panel('learning', icons.knowledge, 'Confidence', h('span', { class: 'panel-note' }, 'derived'), learningEl),
       ),
     ),
   );
@@ -208,12 +211,41 @@ export function createLab(container: HTMLElement, options: LabOptions): () => vo
     renderControls(run.agent.isConfident(), position);
     timeline.update({ events: controller.head.events, cursor: controller.cursor, stops });
 
-    renderLevel(levelEl, run.agent);
+    // The situation being looked up: the selected cell, else where the last
+    // move started (the question the agent actually asked), else where it is.
+    const last = summary.lastStep;
+    const situation = selected ?? last?.from ?? position;
+    const lookups = lookupsAt(run.agent, situation);
+    const matched = new Set(lookups.flatMap((lookup) => lookup.matches.map((entry) => entry.key)));
+    const answered = new Set(lookups.flatMap((lookup) => lookup.prediction?.basis ?? []));
+
+    put(kbAsideEl,
+      h('span', { class: 'panel-note' }, `${run.agent.kb.size} rows`),
+      h('div', { class: 'segmented segmented-small', 'aria-label': 'Order' },
+        ...([['written', 'Newest first'], ['facts', 'Fewest facts first']] as [Sort, string][]).map(([id, label]) =>
+          h('button', {
+            class: cx(sort === id && 'is-on'),
+            onClick: () => {
+              sort = id;
+              render();
+            },
+          }, label)),
+      ),
+    );
+    renderKnowledge(knowledgeEl, { agent: run.agent, summary, sort, matched, answered, onShowMove: (move) => seek(afterMove(move)) });
+
+    lookupNameEl.textContent = `at ${formatState(situation)}: ${selected ? 'the selected cell' : last ? 'where the last move started' : 'where the agent is'}`;
+    renderLookup(lookupEl, {
+      state: situation,
+      lookups,
+      taken: !selected && last ? last.action : null,
+      factsOf: (key) => {
+        const entry = run.agent.kb.get(key);
+        return entry ? formatFacts(entry.inputs) : key;
+      },
+    });
+
     renderLearning(learningEl, { agent: run.agent, summary, possibleMoves: view.states().length * run.agent.actions.length });
-    renderCellBeliefs(cellEl, { state: selected, agent: run.agent, open: selected ? view.isOpen(selected) : false });
-    cellNameEl.textContent = selected ? formatState(selected) : 'none';
-    const shown = renderKnowledge(knowledgeEl, { agent: run.agent, summary, onShowMove: (move) => seek(afterMove(move)) });
-    entryCountEl.textContent = String(shown);
   }
 
   function onKey(event: KeyboardEvent): void {

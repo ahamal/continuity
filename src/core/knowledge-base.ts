@@ -97,6 +97,11 @@ export class KnowledgeBase {
     return best;
   }
 
+  /** Every entry that applies to `known`: all of its inputs are contained in it. */
+  matching(known: Facts): Entry[] {
+    return this.entries().filter((entry) => isSubsetOf(entry.inputs, known));
+  }
+
   get(key: string): Entry | undefined {
     return this.byKey.get(key);
   }

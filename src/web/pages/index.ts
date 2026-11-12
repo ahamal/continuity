@@ -6,6 +6,7 @@ import states from './states.html?raw';
 import theory from './theory.html?raw';
 import world1d from './world-1d.html?raw';
 import world2d from './world-2d.html?raw';
+import worldWalls from './world-walls.html?raw';
 
 export interface Page {
   id: string;
@@ -45,6 +46,7 @@ export const pages: Page[] = [
   { id: 'theory', label: 'Theory', mount: prose(theory) },
   { id: 'implementation', label: 'Implementation', mount: prose(implementation) },
   { id: '1d', label: '1D world', layout: 'lab', mount: withLab(world1d, twoLevels, ['1d']) },
-  { id: '2d', label: '2D world', layout: 'lab', mount: withLab(world2d, twoLevels, ['2d', '2d-walls']) },
+  { id: '2d', label: '2D world', layout: 'lab', mount: withLab(world2d, twoLevels, ['2d']) },
+  { id: 'walls', label: '2D world with walls', layout: 'lab', mount: withLab(worldWalls, twoLevels, ['2d-walls']) },
   { id: 'states', label: 'State representation', current: true, mount: prose(states) },
 ];
